@@ -31,8 +31,83 @@ type HomePageProps = {
   currentUser: AuthUserDto | null
 }
 
+type CarouselItem = {
+  title: string
+  caption: string
+  imageUrl: string
+}
+
+function CarouselShotCard({ item, index, alt = false }: { item: CarouselItem; index: number; alt?: boolean }) {
+  const [imageSrc, setImageSrc] = useState(item.imageUrl)
+  const [retriedWithLocalPath, setRetriedWithLocalPath] = useState(false)
+  const [imageFailed, setImageFailed] = useState(false)
+
+  useEffect(() => {
+    setImageSrc(item.imageUrl)
+    setRetriedWithLocalPath(false)
+    setImageFailed(false)
+  }, [item.imageUrl])
+
+  const fallbackGradients = [
+    'bg-gradient-to-br from-sky-500/45 via-indigo-500/35 to-slate-900/95',
+    'bg-gradient-to-br from-amber-400/40 via-orange-500/35 to-slate-900/95',
+    'bg-gradient-to-br from-emerald-500/40 via-teal-500/35 to-slate-900/95',
+    'bg-gradient-to-br from-rose-500/40 via-fuchsia-500/30 to-slate-900/95',
+  ]
+  const fallbackClass = fallbackGradients[index % fallbackGradients.length]
+  const overlayClass = alt
+    ? 'bg-[radial-gradient(circle_at_bottom_right,rgba(244,198,120,0.22),transparent_30%),linear-gradient(170deg,rgba(39,51,69,0.2),rgba(22,27,38,0.9))]'
+    : 'bg-[radial-gradient(circle_at_top_left,rgba(148,184,255,0.25),transparent_32%),linear-gradient(160deg,rgba(33,43,61,0.24),rgba(18,24,34,0.88))]'
+
+  return (
+    <article className={`kitchen-shot-card${alt ? ' kitchen-shot-card-alt' : ''}`}>
+      {!imageFailed && (
+        <img
+          alt={item.title}
+          className="kitchen-shot-image"
+          src={imageSrc}
+          loading="lazy"
+          onError={() => {
+            if (!retriedWithLocalPath && imageSrc.startsWith('/react/')) {
+              setRetriedWithLocalPath(true)
+              setImageSrc(imageSrc.replace('/react/', '/'))
+              return
+            }
+
+            setImageFailed(true)
+          }}
+        />
+      )}
+      {imageFailed && (
+        <div className={`absolute inset-0 ${fallbackClass}`}>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.16),transparent_50%)]" />
+        </div>
+      )}
+      <div className={`absolute inset-0 ${overlayClass}`} />
+      <div className={`absolute inset-0 flex flex-col justify-between ${alt ? 'p-4' : 'p-5'}`}>
+        <div className="flex items-start justify-between gap-3">
+          <p className="rounded-full border border-white/15 bg-white/8 px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-sky-100/80">
+            {item.title}
+          </p>
+          {alt ? (
+            <span className="text-[10px] font-black uppercase tracking-[0.24em] text-amber-100/70">Kitchen</span>
+          ) : (
+            <div className="rounded-full border border-amber-200/20 bg-amber-100/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-amber-100/80">
+              {index % 2 === 0 ? 'Live' : 'Mood'}
+            </div>
+          )}
+        </div>
+        <div>
+          {!alt && <p className="kitchen-shot-title text-2xl">{item.title}</p>}
+          <p className={`kitchen-shot-caption ${alt ? 'text-sm' : 'mt-2 text-sm'}`}>{item.caption}</p>
+        </div>
+      </div>
+    </article>
+  )
+}
+
 function HomePage({ currentUser }: HomePageProps) {
-  const carouselItems = [
+  const carouselItems: CarouselItem[] = [
     {
       title: 'Tools',
       caption: 'A quiet collection of knives, boards, and everyday utensils.',
@@ -267,24 +342,7 @@ function HomePage({ currentUser }: HomePageProps) {
       <div className="kitchen-carousel-window rounded-[1.8rem] border border-slate-700/70 bg-slate-950/45 p-6 sm:p-7">
         <div className="kitchen-carousel-track kitchen-carousel-track-left">
           {[...carouselItems, ...carouselItems].map((item, index) => (
-            <article key={`${item.title}-${index}`} className="kitchen-shot-card">
-              <img className="kitchen-shot-image" src={item.imageUrl} alt={item.title} loading="lazy" />
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(148,184,255,0.25),transparent_32%),linear-gradient(160deg,rgba(33,43,61,0.24),rgba(18,24,34,0.88))]" />
-              <div className="absolute inset-0 flex flex-col justify-between p-5">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="rounded-full border border-white/15 bg-white/8 px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-sky-100/80">
-                    {item.title}
-                  </div>
-                  <div className="rounded-full border border-amber-200/20 bg-amber-100/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-amber-100/80">
-                    {index % 2 === 0 ? 'Live' : 'Mood'}
-                  </div>
-                </div>
-                <div>
-                  <p className="kitchen-shot-title text-2xl">{item.title}</p>
-                  <p className="kitchen-shot-caption mt-2 text-sm">{item.caption}</p>
-                </div>
-              </div>
-            </article>
+            <CarouselShotCard key={`${item.title}-${index}`} item={item} index={index} />
           ))}
         </div>
       </div>
@@ -292,19 +350,7 @@ function HomePage({ currentUser }: HomePageProps) {
       <div className="kitchen-carousel-window rounded-[1.8rem] border border-slate-700/70 bg-slate-950/35 p-6 sm:p-7">
         <div className="kitchen-carousel-track kitchen-carousel-track-right">
           {[...carouselItems.slice(2), ...carouselItems.slice(0, 2), ...carouselItems.slice(2), ...carouselItems.slice(0, 2)].map((item, index) => (
-            <article key={`${item.title}-alt-${index}`} className="kitchen-shot-card kitchen-shot-card-alt">
-              <img className="kitchen-shot-image" src={item.imageUrl} alt={item.title} loading="lazy" />
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(244,198,120,0.22),transparent_30%),linear-gradient(170deg,rgba(39,51,69,0.2),rgba(22,27,38,0.9))]" />
-              <div className="absolute inset-0 flex flex-col justify-between p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <p className="rounded-full border border-white/15 bg-white/8 px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-sky-100/80">
-                    {item.title}
-                  </p>
-                  <span className="text-[10px] font-black uppercase tracking-[0.24em] text-amber-100/70">Kitchen</span>
-                </div>
-                <p className="kitchen-shot-caption text-sm">{item.caption}</p>
-              </div>
-            </article>
+            <CarouselShotCard key={`${item.title}-alt-${index}`} item={item} index={index} alt />
           ))}
         </div>
       </div>

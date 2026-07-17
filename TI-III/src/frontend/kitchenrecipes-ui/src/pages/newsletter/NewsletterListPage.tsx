@@ -94,10 +94,12 @@ export function NewsletterListPage({ canManage = false }: NewsletterListPageProp
 
   useEffect(() => {
     void loadSubscribers()
-    void loadTemplates()
-    void loadStats()
-    void loadHistory()
-  }, [])
+    if (canManage) {
+      void loadTemplates()
+      void loadStats()
+      void loadHistory()
+    }
+  }, [canManage])
 
   async function onDelete(subscriber: NewsletterSubscriberDto) {
     try {
@@ -310,6 +312,7 @@ export function NewsletterListPage({ canManage = false }: NewsletterListPageProp
         </div>
       )}
 
+      {canManage && (
       <div className="mt-8 rounded-xl border border-pine/20 bg-white p-4">
         <h3 className="font-heading text-2xl text-slate">{t('newsletter.campaign.title')}</h3>
         <p className="mt-1 text-sm text-slate/75">{t('newsletter.campaign.description')}</p>
@@ -432,6 +435,7 @@ export function NewsletterListPage({ canManage = false }: NewsletterListPageProp
           </div>
         </div>
       </div>
+      )}
 
       <ConfirmDialog
         cancelLabel={t('common.cancel')}

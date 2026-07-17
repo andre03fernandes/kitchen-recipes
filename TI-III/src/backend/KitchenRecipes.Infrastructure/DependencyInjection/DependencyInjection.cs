@@ -26,7 +26,7 @@ public static class DependencyInjection
         {
             var aiOptions = configuration.GetSection(AiOptions.SectionName).Get<AiOptions>() ?? new AiOptions();
             client.BaseAddress = new Uri(aiOptions.BaseUrl);
-            client.Timeout = TimeSpan.FromSeconds(30);
+            client.Timeout = TimeSpan.FromSeconds(180);
         });
         services.AddScoped<IAssistantTextGenerator>(provider => provider.GetRequiredService<OllamaAssistantTextGenerator>());
 

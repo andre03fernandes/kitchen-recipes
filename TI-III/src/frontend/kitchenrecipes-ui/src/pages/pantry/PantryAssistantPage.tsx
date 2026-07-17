@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import jsPDF from 'jspdf'
 import { Link } from 'react-router-dom'
 import { ConfirmDialog } from '../../components/dialogs/ConfirmDialog'
 import { PromptDialog } from '../../components/dialogs/PromptDialog'
@@ -17,6 +18,46 @@ const starterPrompts = [
   'Where do I send a newsletter campaign and check campaign history?',
 ]
 
+const imageMarkerRegex = /\[\[image:(https?:\/\/[^\]\s]+)\]\]/i
+
+type ParsedAssistantContent = {
+  text: string
+  imageUrl: string | null
+}
+
+function parseAssistantContent(content: string): ParsedAssistantContent {
+  const match = content.match(imageMarkerRegex)
+  const markerUrl = match?.[1]?.trim() ?? ''
+  const safeImageUrl = toSafeHttpUrl(markerUrl)
+  const text = content.replace(imageMarkerRegex, '').trim()
+
+  return {
+    text,
+    imageUrl: safeImageUrl,
+  }
+}
+
+function stripImageMarker(content: string): string {
+  return content.replace(imageMarkerRegex, '').trim()
+}
+
+function toSafeHttpUrl(value: string): string | null {
+  if (!value) {
+    return null
+  }
+
+  try {
+    const parsed = new URL(value)
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+      return parsed.toString()
+    }
+  } catch {
+    return null
+  }
+
+  return null
+}
+
 export function PantryAssistantPage() {
   const [threads, setThreads] = useState<AssistantChatThreadSummaryDto[]>([])
   const [activeThreadId, setActiveThreadId] = useState<number | null>(null)
@@ -25,6 +66,7 @@ export function PantryAssistantPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isLoadingThread, setIsLoadingThread] = useState(false)
   const [isSending, setIsSending] = useState(false)
+  const [isExportingPdf, setIsExportingPdf] = useState(false)
   const [feedback, setFeedback] = useState('')
   const [streamingAssistantMessageId, setStreamingAssistantMessageId] = useState<number | null>(null)
   const [profileSettings, setProfileSettings] = useState<AiProfileSettingsDto | null>(null)
@@ -32,6 +74,9 @@ export function PantryAssistantPage() {
   const [renameTarget, setRenameTarget] = useState<AssistantChatThreadSummaryDto | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<AssistantChatThreadSummaryDto | null>(null)
   const chatScrollRef = useRef<HTMLDivElement | null>(null)
+  const streamingAssistantMessageIdRef = useRef<number | null>(null)
+  const pendingPdfTitleRef = useRef<string | null>(null)
+  const streamAbortControllerRef = useRef<AbortController | null>(null)
 
   const latestAssistantMessage = useMemo(
     () => [...messages].reverse().find((item) => item.role === 'assistant') ?? null,
@@ -132,6 +177,7 @@ export function PantryAssistantPage() {
   function applyStreamEvent(event: AssistantChatStreamEventDto) {
     if (event.type === 'thread' && event.thread && event.userMessage) {
       const assistantId = -Date.now()
+      streamingAssistantMessageIdRef.current = assistantId
       setStreamingAssistantMessageId(assistantId)
 
       setActiveThreadId(event.thread.id)
@@ -155,10 +201,12 @@ export function PantryAssistantPage() {
       return
     }
 
-    if (event.type === 'token' && event.token && streamingAssistantMessageId !== null) {
+    const currentStreamingMessageId = streamingAssistantMessageIdRef.current
+
+    if (event.type === 'token' && event.token && currentStreamingMessageId !== null) {
       setMessages((current) =>
         current.map((item) =>
-          item.id === streamingAssistantMessageId
+          item.id === currentStreamingMessageId
             ? {
                 ...item,
                 content: item.content + event.token,
@@ -169,14 +217,15 @@ export function PantryAssistantPage() {
       return
     }
 
-    if (event.type === 'done' && event.assistantMessage && streamingAssistantMessageId !== null) {
+    if (event.type === 'done' && event.assistantMessage && currentStreamingMessageId !== null) {
       setMessages((current) =>
         current.map((item) =>
-          item.id === streamingAssistantMessageId
+          item.id === currentStreamingMessageId
             ? event.assistantMessage!
             : item,
         ),
       )
+      streamingAssistantMessageIdRef.current = null
       setStreamingAssistantMessageId(null)
       if (event.thread) {
         setThreads((current) => {
@@ -184,6 +233,12 @@ export function PantryAssistantPage() {
           return [event.thread!, ...remaining]
         })
       }
+
+      const requestedPdfTitle = pendingPdfTitleRef.current
+      if (requestedPdfTitle) {
+        exportAssistantReplyPdf(event.assistantMessage, requestedPdfTitle)
+      }
+      pendingPdfTitleRef.current = null
     }
   }
 
@@ -194,18 +249,191 @@ export function PantryAssistantPage() {
       return
     }
 
+    pendingPdfTitleRef.current = resolveRequestedPdfTitle(message)
+
+    const previousPrompt = prompt
     setIsSending(true)
     setFeedback('')
+    setPrompt('')
+
+    const abortController = new AbortController()
+    streamAbortControllerRef.current = abortController
 
     try {
-      await streamAssistantThreadMessage({ threadId: activeThreadId ?? undefined, message }, applyStreamEvent)
+      await streamAssistantThreadMessage(
+        { threadId: activeThreadId ?? undefined, message },
+        applyStreamEvent,
+        abortController.signal,
+      )
+    } catch (error) {
+      const isAbort = error instanceof DOMException && error.name === 'AbortError'
+      if (isAbort) {
+        setFeedback('Generation stopped.')
+      } else {
+        setFeedback(t('pantryAssistant.errors.messageFailed'))
+        if (!customPrompt) {
+          setPrompt(previousPrompt)
+        }
+      }
 
-      setPrompt('')
-    } catch {
-      setFeedback(t('pantryAssistant.errors.messageFailed'))
+      pendingPdfTitleRef.current = null
+      streamingAssistantMessageIdRef.current = null
       setStreamingAssistantMessageId(null)
     } finally {
+      streamAbortControllerRef.current = null
       setIsSending(false)
+    }
+  }
+
+  function stopStreaming() {
+    streamAbortControllerRef.current?.abort()
+    streamAbortControllerRef.current = null
+    pendingPdfTitleRef.current = null
+    streamingAssistantMessageIdRef.current = null
+    setStreamingAssistantMessageId(null)
+    setIsSending(false)
+  }
+
+  function resolveRequestedPdfTitle(message: string): string | null {
+    const normalized = message.toLowerCase()
+    const hasPdfKeyword = normalized.includes('pdf')
+    const hasActionKeyword = /(gera|gerar|exporta|exportar|export|cria|criar|download|generate|generated|generat|create|created|make|save|convert|converter)/i.test(normalized)
+    const looksLikeQuestion = /(can you|could you|podes|consegues|please|pls|por favor)/i.test(normalized)
+
+    const isPdfRequest =
+      hasPdfKeyword
+      && (hasActionKeyword || looksLikeQuestion)
+
+    if (!isPdfRequest) {
+      return null
+    }
+
+    const quoted = message.match(/"([^"]{3,80})"|'([^']{3,80})'/)
+    const quotedTitle = (quoted?.[1] ?? quoted?.[2] ?? '').trim()
+    if (quotedTitle) {
+      return quotedTitle
+    }
+
+    const titleHint = message.match(/(?:titulo|título|title|nome|name)\s*[:=]\s*([^\n]{3,80})/i)
+    const parsedTitle = (titleHint?.[1] ?? '').trim()
+    if (parsedTitle) {
+      return parsedTitle
+    }
+
+    return 'Assistant reply'
+  }
+
+  function exportAssistantReplyPdf(assistantMessage: AssistantChatMessageDto, title: string) {
+    try {
+      const doc = new jsPDF({ unit: 'pt', format: 'a4' })
+      const margin = 40
+      const pageWidth = doc.internal.pageSize.getWidth()
+      const pageHeight = doc.internal.pageSize.getHeight()
+      const maxTextWidth = pageWidth - margin * 2
+      let y = margin
+
+      doc.setFont('helvetica', 'bold')
+      doc.setFontSize(16)
+      doc.text(title, margin, y)
+      y += 24
+
+      doc.setFont('helvetica', 'normal')
+      doc.setFontSize(10)
+      doc.text(`Generated at ${new Date().toLocaleString()}`, margin, y)
+      y += 20
+
+      doc.setFont('helvetica', 'bold')
+      doc.setFontSize(11)
+      doc.text(`Assistant - ${new Date(assistantMessage.createdAtUtc).toLocaleString()}`, margin, y)
+      y += 16
+
+      const lines = doc.splitTextToSize(stripImageMarker(assistantMessage.content) || '-', maxTextWidth)
+      doc.setFont('helvetica', 'normal')
+      doc.setFontSize(11)
+
+      for (const line of lines) {
+        if (y > pageHeight - margin) {
+          doc.addPage()
+          y = margin
+        }
+
+        doc.text(line, margin, y)
+        y += 14
+      }
+
+      const slug = title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+      const timestamp = new Date().toISOString().replaceAll(':', '-')
+      const filename = `${slug || 'assistant-reply'}-${timestamp}.pdf`
+      doc.save(filename)
+      setFeedback(`PDF generated: ${filename}`)
+    } catch {
+      setFeedback('Could not generate PDF from assistant reply.')
+    }
+  }
+
+  function exportConversationPdf() {
+    if (messages.length === 0) {
+      setFeedback('No conversation available to export yet.')
+      return
+    }
+
+    setIsExportingPdf(true)
+    try {
+      const doc = new jsPDF({ unit: 'pt', format: 'a4' })
+      const pageWidth = doc.internal.pageSize.getWidth()
+      const pageHeight = doc.internal.pageSize.getHeight()
+      const margin = 40
+      const maxTextWidth = pageWidth - margin * 2
+      let y = margin
+
+      const activeThread = threads.find((thread) => thread.id === activeThreadId)
+      const title = activeThread?.title ?? 'Assistant conversation'
+
+      doc.setFont('helvetica', 'bold')
+      doc.setFontSize(14)
+      doc.text(title, margin, y)
+      y += 24
+
+      doc.setFont('helvetica', 'normal')
+      doc.setFontSize(10)
+      doc.text(`Exported at ${new Date().toLocaleString()}`, margin, y)
+      y += 20
+
+      for (const message of messages) {
+        const role = message.role === 'assistant' ? 'Assistant' : 'You'
+        const timestamp = new Date(message.createdAtUtc).toLocaleString()
+        const heading = `${role} - ${timestamp}`
+
+        const headingLines = doc.splitTextToSize(heading, maxTextWidth)
+        const bodyLines = doc.splitTextToSize(stripImageMarker(message.content) || '-', maxTextWidth)
+        const blockHeight = (headingLines.length + bodyLines.length) * 14 + 14
+
+        if (y + blockHeight > pageHeight - margin) {
+          doc.addPage()
+          y = margin
+        }
+
+        doc.setFont('helvetica', 'bold')
+        doc.setFontSize(11)
+        doc.text(headingLines, margin, y)
+        y += headingLines.length * 14
+
+        doc.setFont('helvetica', 'normal')
+        doc.setFontSize(11)
+        doc.text(bodyLines, margin, y)
+        y += bodyLines.length * 14 + 14
+      }
+
+      const timestampSlug = new Date().toISOString().replaceAll(':', '-')
+      doc.save(`assistant-conversation-${timestampSlug}.pdf`)
+      setFeedback('Conversation exported to PDF.')
+    } catch {
+      setFeedback('Could not export this conversation to PDF.')
+    } finally {
+      setIsExportingPdf(false)
     }
   }
 
@@ -219,8 +447,12 @@ export function PantryAssistantPage() {
       return
     }
 
+    if (isStreaming || isSending) {
+      return
+    }
+
     void openThread(activeThreadId)
-  }, [activeThreadId])
+  }, [activeThreadId, isStreaming, isSending])
 
   useEffect(() => {
     if (!chatScrollRef.current) {
@@ -268,6 +500,14 @@ export function PantryAssistantPage() {
         </div>
 
         <div className="flex flex-wrap gap-2">
+          <button
+            className="rounded-xl border border-pine/30 bg-white px-4 py-2 font-semibold text-pine transition hover:bg-pine/5 disabled:cursor-not-allowed disabled:opacity-60"
+            disabled={isExportingPdf || messages.length === 0}
+            onClick={exportConversationPdf}
+            type="button"
+          >
+            {isExportingPdf ? 'Exporting PDF...' : 'Export PDF'}
+          </button>
           <Link className="rounded-xl bg-pine px-4 py-2 font-semibold text-white transition hover:bg-pine/90" to="/pantry">
             {t('pantryAssistant.actions.backToPantry')}
           </Link>
@@ -367,6 +607,12 @@ export function PantryAssistantPage() {
                   </div>
                 ) : (
                   messages.map((entry) => (
+                    (() => {
+                      const parsed = entry.role === 'assistant'
+                        ? parseAssistantContent(entry.content)
+                        : { text: entry.content, imageUrl: null }
+
+                      return (
                     <div
                       key={entry.id}
                       className={`rounded-2xl px-4 py-3 text-sm leading-6 ${entry.role === 'assistant' ? 'bg-emerald-50 text-slate' : 'ml-auto max-w-[85%] bg-pine text-white'}`}
@@ -374,7 +620,18 @@ export function PantryAssistantPage() {
                       <p className="text-xs font-bold uppercase tracking-[0.18em] opacity-70">
                         {entry.role === 'assistant' ? t('pantryAssistant.chat.assistantLabel') : t('pantryAssistant.chat.userLabel')}
                       </p>
-                      <p className="mt-2 whitespace-pre-line">{entry.content}</p>
+                      {parsed.text && <p className="mt-2 whitespace-pre-line">{parsed.text}</p>}
+
+                      {parsed.imageUrl && (
+                        <div className="mt-3 overflow-hidden rounded-2xl border border-emerald-200 bg-white p-2 shadow-sm">
+                          <img
+                            alt="Generated dish"
+                            className="h-auto max-h-[420px] w-full rounded-xl object-cover"
+                            loading="lazy"
+                            src={parsed.imageUrl}
+                          />
+                        </div>
+                      )}
 
                       {entry.role === 'assistant' && entry.pantryHighlights.length > 0 && (
                         <div className="mt-3 rounded-xl border border-emerald-200 bg-white/80 p-3 text-slate">
@@ -384,6 +641,8 @@ export function PantryAssistantPage() {
                       )}
 
                     </div>
+                      )
+                    })()
                   ))
                 )}
 
@@ -407,16 +666,27 @@ export function PantryAssistantPage() {
 
                 <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
                   <p className="text-xs text-slate/65">{t('pantryAssistant.chat.helper')}</p>
-                  <button
-                    className="rounded-xl bg-pine px-4 py-2 font-semibold text-white transition hover:bg-pine/90 disabled:cursor-not-allowed disabled:bg-pine/60"
-                    disabled={isSending || isStreaming}
-                    onClick={() => {
-                      void submitPrompt()
-                    }}
-                    type="button"
-                  >
-                    {isSending ? t('pantryAssistant.actions.sending') : t('pantryAssistant.actions.send')}
-                  </button>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {(isSending || isStreaming) && (
+                      <button
+                        className="rounded-xl border border-rose-300 bg-white px-4 py-2 font-semibold text-rose-700 transition hover:bg-rose-50"
+                        onClick={stopStreaming}
+                        type="button"
+                      >
+                        Stop
+                      </button>
+                    )}
+                    <button
+                      className="rounded-xl bg-pine px-4 py-2 font-semibold text-white transition hover:bg-pine/90 disabled:cursor-not-allowed disabled:bg-pine/60"
+                      disabled={isSending || isStreaming}
+                      onClick={() => {
+                        void submitPrompt()
+                      }}
+                      type="button"
+                    >
+                      {isSending ? t('pantryAssistant.actions.sending') : t('pantryAssistant.actions.send')}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

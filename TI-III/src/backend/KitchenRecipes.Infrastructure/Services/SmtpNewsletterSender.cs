@@ -28,12 +28,13 @@ public sealed class SmtpNewsletterSender : INewsletterSender
         {
             From = new MailAddress(_smtpOptions.SenderEmail, _smtpOptions.SenderName),
             Subject = subject,
-            Body = htmlBody,
-            IsBodyHtml = true,
+            Body = plainTextBody,
+            IsBodyHtml = false,
         };
 
         mailMessage.To.Add(new MailAddress(recipientEmail));
         mailMessage.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(plainTextBody, null, "text/plain"));
+        mailMessage.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(htmlBody, null, "text/html"));
 
         using var smtpClient = new SmtpClient(_smtpOptions.Host, _smtpOptions.Port)
         {

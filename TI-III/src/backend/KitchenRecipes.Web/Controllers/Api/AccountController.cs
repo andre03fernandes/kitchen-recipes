@@ -110,6 +110,47 @@ public sealed class AccountController : ControllerBase
         }
     }
 
+    [Authorize(Roles = UserRoles.Admin)]
+    [HttpDelete("users/{id:int}")]
+    public async Task<IActionResult> DeleteUser(
+        int id,
+        [FromServices] IAccountService accountService,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var validId = int.TryParse(idClaim, out var currentUserId);
+            if (!validId)
+            {
+                return Unauthorized();
+            }
+
+            if (currentUserId == id)
+            {
+                return BadRequest(new { message = "You cannot delete your own account." });
+            }
+
+            var deleted = await accountService.DeleteUserAsync(id, cancellationToken);
+            return deleted ? NoContent() : NotFound();
+        }
+        catch (ArgumentException exception)
+        {
+            return BadRequest(new { message = exception.Message });
+        }
+    }
+
+    [Authorize(Roles = UserRoles.Admin)]
+    [HttpPost("users/{id:int}/reactivate")]
+    public async Task<IActionResult> ReactivateUser(
+        int id,
+        [FromServices] IAccountService accountService,
+        CancellationToken cancellationToken)
+    {
+        var reactivated = await accountService.ReactivateUserAsync(id, cancellationToken);
+        return reactivated ? NoContent() : NotFound();
+    }
+
     private async Task SignInAsync(AuthUserDto user)
     {
         var claims = new List<Claim>

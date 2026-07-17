@@ -50,18 +50,18 @@ function getExpiryBadge(expirationDate: string | null) {
   const category = getExpiryCategory(expirationDate)
 
   if (category === 'noExpiry') {
-    return { label: t('pantry.catalog.badges.noExpiry'), className: 'bg-slate-100 text-slate-700' }
+    return { label: t('pantry.catalog.badges.noExpiry'), className: 'pantry-expiry-badge pantry-expiry-badge-no-expiry' }
   }
 
   if (category === 'expired') {
-    return { label: t('pantry.catalog.badges.expired'), className: 'bg-rose-100 text-rose-800' }
+    return { label: t('pantry.catalog.badges.expired'), className: 'pantry-expiry-badge pantry-expiry-badge-expired' }
   }
 
   if (category === 'expiringSoon') {
-    return { label: t('pantry.catalog.badges.expiringSoon'), className: 'bg-amber-100 text-amber-800' }
+    return { label: t('pantry.catalog.badges.expiringSoon'), className: 'pantry-expiry-badge pantry-expiry-badge-expiring' }
   }
 
-  return { label: t('pantry.catalog.badges.fresh'), className: 'bg-emerald-100 text-emerald-800' }
+  return { label: t('pantry.catalog.badges.fresh'), className: 'pantry-expiry-badge pantry-expiry-badge-fresh' }
 }
 
 export function PantryListPage({ canManage = false }: PantryListPageProps) {

@@ -392,6 +392,7 @@
       "email": "Email",
       "password": "Password",
       "role": "Role",
+      "status": "Status",
       "actions": "Actions"
     },
     "actions": {
@@ -400,7 +401,14 @@
       "goToLogin": "Go To Login",
       "logout": "Logout",
       "makeUser": "Set User",
-      "makeAdmin": "Set Admin"
+      "makeAdmin": "Set Admin",
+      "deleteUser": "Delete User",
+      "reactivateUser": "Reactivate",
+      "currentUser": "Current User"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
     },
     "messages": {
       "loading": "Loading account state...",
@@ -410,14 +418,19 @@
       "registerSuccess": "Account created and signed in.",
       "loginSuccess": "Login successful.",
       "logoutSuccess": "Logged out successfully.",
-      "roleUpdated": "User role updated successfully."
+      "roleUpdated": "User role updated successfully.",
+      "deleteConfirm": "Delete this user account?",
+      "userDeleted": "User deleted successfully.",
+      "userReactivated": "User reactivated successfully."
     },
     "errors": {
       "registerFailed": "Unable to register right now.",
       "loginFailed": "Unable to login. Check your credentials.",
       "logoutFailed": "Unable to logout right now.",
       "loadUsersFailed": "Unable to load users list.",
-      "roleUpdateFailed": "Unable to update user role."
+      "roleUpdateFailed": "Unable to update user role.",
+      "userDeleteFailed": "Unable to delete user right now.",
+      "userReactivateFailed": "Unable to reactivate user right now."
     }
   },
   "footer": {

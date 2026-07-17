@@ -78,6 +78,7 @@ export async function deleteAssistantThread(threadId: number): Promise<void> {
 export async function streamAssistantThreadMessage(
   request: SendAssistantChatMessageRequestDto,
   onEvent: (event: AssistantChatStreamEventDto) => void,
+  signal?: AbortSignal,
 ): Promise<void> {
   const response = await fetch('/api/assistant/threads/message/stream', {
     method: 'POST',
@@ -86,6 +87,7 @@ export async function streamAssistantThreadMessage(
     },
     credentials: 'same-origin',
     body: JSON.stringify(request),
+    signal,
   })
 
   if (!response.ok || !response.body) {

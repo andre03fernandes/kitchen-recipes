@@ -27,12 +27,23 @@ public sealed class AccountService : IAccountService
 
         var normalizedEmail = request.Email.Trim().ToLowerInvariant();
 
-        var duplicateEmail = await _context.AppUsers
-            .AnyAsync(x => x.Email == normalizedEmail, cancellationToken);
+        var existingUser = await _context.AppUsers
+            .FirstOrDefaultAsync(x => x.Email == normalizedEmail, cancellationToken);
 
-        if (duplicateEmail)
+        if (existingUser is not null && existingUser.IsActive)
         {
             throw new ArgumentException("An account with this email already exists.");
+        }
+
+        if (existingUser is not null && !existingUser.IsActive)
+        {
+            existingUser.FullName = request.FullName.Trim();
+            existingUser.PasswordHash = HashPassword(request.Password);
+            existingUser.IsActive = true;
+            existingUser.UpdatedAtUtc = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync(cancellationToken);
+            return ToDto(existingUser);
         }
 
         var hasUsers = await _context.AppUsers.AnyAsync(cancellationToken);
@@ -61,11 +72,16 @@ public sealed class AccountService : IAccountService
 
         var user = await _context.AppUsers
             .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Email == normalizedEmail && x.IsActive, cancellationToken);
+            .FirstOrDefaultAsync(x => x.Email == normalizedEmail, cancellationToken);
 
         if (user is null)
         {
             return null;
+        }
+
+        if (!user.IsActive)
+        {
+            throw new ArgumentException("This account is deactivated. Register again with the same email to reactivate it.");
         }
 
         var validPassword = VerifyPassword(request.Password, user.PasswordHash);
@@ -90,7 +106,8 @@ public sealed class AccountService : IAccountService
     {
         return await _context.AppUsers
             .AsNoTracking()
-            .OrderBy(x => x.FullName)
+            .OrderByDescending(x => x.IsActive)
+            .ThenBy(x => x.FullName)
             .Select(x => new AuthUserDto(x.Id, x.FullName, x.Email, x.Role, x.IsActive))
             .ToListAsync(cancellationToken);
     }
@@ -105,7 +122,60 @@ public sealed class AccountService : IAccountService
             return false;
         }
 
+        if (user.IsActive && user.Role == UserRoles.Admin && request.Role != UserRoles.Admin)
+        {
+            var activeAdminsCount = await _context.AppUsers.CountAsync(x => x.IsActive && x.Role == UserRoles.Admin, cancellationToken);
+            if (activeAdminsCount <= 1)
+            {
+                throw new ArgumentException("You cannot demote the last active admin.");
+            }
+        }
+
         user.Role = request.Role;
+        user.UpdatedAtUtc = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync(cancellationToken);
+        return true;
+    }
+
+    public async Task<bool> DeleteUserAsync(int userId, CancellationToken cancellationToken = default)
+    {
+        var user = await _context.AppUsers.FirstOrDefaultAsync(x => x.Id == userId, cancellationToken);
+        if (user is null || !user.IsActive)
+        {
+            return false;
+        }
+
+        if (user.Role == UserRoles.Admin)
+        {
+            var activeAdminsCount = await _context.AppUsers.CountAsync(x => x.IsActive && x.Role == UserRoles.Admin, cancellationToken);
+            if (activeAdminsCount <= 1)
+            {
+                throw new ArgumentException("You cannot delete the last active admin.");
+            }
+        }
+
+        user.IsActive = false;
+        user.UpdatedAtUtc = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync(cancellationToken);
+        return true;
+    }
+
+    public async Task<bool> ReactivateUserAsync(int userId, CancellationToken cancellationToken = default)
+    {
+        var user = await _context.AppUsers.FirstOrDefaultAsync(x => x.Id == userId, cancellationToken);
+        if (user is null)
+        {
+            return false;
+        }
+
+        if (user.IsActive)
+        {
+            return true;
+        }
+
+        user.IsActive = true;
         user.UpdatedAtUtc = DateTime.UtcNow;
 
         await _context.SaveChangesAsync(cancellationToken);

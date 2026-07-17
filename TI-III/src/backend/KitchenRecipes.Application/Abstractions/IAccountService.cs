@@ -9,4 +9,6 @@ public interface IAccountService
     Task<AuthUserDto?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<AuthUserDto>> GetUsersAsync(CancellationToken cancellationToken = default);
     Task<bool> UpdateRoleAsync(int userId, UpdateUserRoleRequest request, CancellationToken cancellationToken = default);
+    Task<bool> DeleteUserAsync(int userId, CancellationToken cancellationToken = default);
+    Task<bool> ReactivateUserAsync(int userId, CancellationToken cancellationToken = default);
 }

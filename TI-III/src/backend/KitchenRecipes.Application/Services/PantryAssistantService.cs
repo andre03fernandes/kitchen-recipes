@@ -203,6 +203,8 @@ public sealed class PantryAssistantService : IPantryAssistantService
         builder.AppendLine("You are the AI assistant for the full Kitchen Recipes website.");
         builder.AppendLine("You can help with: recipe ideas, pantry planning, newsletter/admin guidance, account and navigation help.");
         builder.AppendLine("Keep answers concise, practical, and friendly.");
+        builder.AppendLine("Avoid repeating the same wording across turns; vary phrasing and recommendations when the request is similar.");
+        builder.AppendLine("Always provide at least one fresh option or angle compared to previous assistant replies in the same conversation.");
         builder.AppendLine("When the user asks about cooking, use pantry and recipe data provided below.");
         builder.AppendLine("When the user asks about product usage, explain clearly which module/page to use.");
         builder.AppendLine("If stock is missing for a recipe, call it out briefly and suggest alternatives.");

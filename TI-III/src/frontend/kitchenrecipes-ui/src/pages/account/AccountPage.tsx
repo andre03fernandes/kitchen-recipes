@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
+import axios from 'axios'
+import { ConfirmDialog } from '../../components/dialogs/ConfirmDialog'
 import { TableToolbar } from '../../components/table/TableToolbar'
 import { t } from '../../i18n/text'
-import { getUsers, login, logout, me, register, updateUserRole } from '../../services/accountApi'
+import { deleteUser, getUsers, login, logout, me, reactivateUser, register, updateUserRole } from '../../services/accountApi'
 import type { AuthUserDto } from '../../types/account'
 import {
   DEFAULT_TABLE_PAGE_SIZE,
@@ -49,6 +51,8 @@ export function AccountPage({ onAuthChanged }: AccountPageProps) {
   const [userFilterText, setUserFilterText] = useState('')
   const [usersPage, setUsersPage] = useState(1)
   const [usersPageSize, setUsersPageSize] = useState(DEFAULT_TABLE_PAGE_SIZE)
+  const [deleteTarget, setDeleteTarget] = useState<AuthUserDto | null>(null)
+  const [isDeletingUser, setIsDeletingUser] = useState(false)
   const [feedback, setFeedback] = useState('')
 
   useEffect(() => {
@@ -86,8 +90,14 @@ export function AccountPage({ onAuthChanged }: AccountPageProps) {
     event.preventDefault()
     setFeedback('')
 
+    const payload = {
+      fullName: registerForm.fullName.trim(),
+      email: registerForm.email.trim(),
+      password: registerForm.password,
+    }
+
     try {
-      const user = await register(registerForm)
+      const user = await register(payload)
       setCurrentUser(user)
       onAuthChanged?.(user)
       setRegisterForm(emptyRegisterForm)
@@ -96,8 +106,8 @@ export function AccountPage({ onAuthChanged }: AccountPageProps) {
       if (user.role === 'Admin') {
         await loadUsers()
       }
-    } catch {
-      setFeedback(t('account.errors.registerFailed'))
+    } catch (error) {
+      setFeedback(getApiErrorMessage(error, t('account.errors.registerFailed')))
     }
   }
 
@@ -105,8 +115,13 @@ export function AccountPage({ onAuthChanged }: AccountPageProps) {
     event.preventDefault()
     setFeedback('')
 
+    const payload = {
+      email: loginForm.email.trim(),
+      password: loginForm.password,
+    }
+
     try {
-      const user = await login(loginForm)
+      const user = await login(payload)
       setCurrentUser(user)
       onAuthChanged?.(user)
       setLoginForm(emptyLoginForm)
@@ -115,8 +130,8 @@ export function AccountPage({ onAuthChanged }: AccountPageProps) {
       if (user.role === 'Admin') {
         await loadUsers()
       }
-    } catch {
-      setFeedback(t('account.errors.loginFailed'))
+    } catch (error) {
+      setFeedback(getApiErrorMessage(error, t('account.errors.loginFailed')))
     }
   }
 
@@ -139,6 +154,35 @@ export function AccountPage({ onAuthChanged }: AccountPageProps) {
       setFeedback(t('account.messages.roleUpdated'))
     } catch {
       setFeedback(t('account.errors.roleUpdateFailed'))
+    }
+  }
+
+  async function confirmDeleteUser() {
+    if (!deleteTarget) {
+      return
+    }
+
+    setIsDeletingUser(true)
+
+    try {
+      await deleteUser(deleteTarget.id)
+      await loadUsers()
+      setFeedback(t('account.messages.userDeleted'))
+      setDeleteTarget(null)
+    } catch {
+      setFeedback(t('account.errors.userDeleteFailed'))
+    } finally {
+      setIsDeletingUser(false)
+    }
+  }
+
+  async function onReactivateUser(userId: number) {
+    try {
+      await reactivateUser(userId)
+      await loadUsers()
+      setFeedback(t('account.messages.userReactivated'))
+    } catch {
+      setFeedback(t('account.errors.userReactivateFailed'))
     }
   }
 
@@ -252,23 +296,36 @@ export function AccountPage({ onAuthChanged }: AccountPageProps) {
                       <th className="py-2 pr-3">{t('account.fields.fullName')}</th>
                       <th className="py-2 pr-3">{t('account.fields.email')}</th>
                       <th className="py-2 pr-3">{t('account.fields.role')}</th>
+                      <th className="py-2 pr-3">{t('account.fields.status')}</th>
                       <th className="py-2 pr-3">{t('account.fields.actions')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-amber-100">
                     {usersPagination.items.map((user) => (
-                      <tr key={user.id} className="text-sm text-slate/90">
+                      <tr key={user.id} className={`text-sm ${user.isActive ? 'text-slate/90' : 'text-slate/60'}`}>
                         <td className="py-3 pr-3">{user.fullName}</td>
                         <td className="py-3 pr-3">{user.email}</td>
                         <td className="py-3 pr-3">
-                          <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-wide ${user.role === 'Admin' ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-700'}`}>
+                          <span
+                            className={`inline-flex rounded-full border px-3 py-1 text-xs font-black uppercase tracking-[0.14em] ${
+                              user.role === 'Admin'
+                                ? 'border-sky-300/70 bg-sky-400/25 text-sky-100'
+                                : 'border-amber-300/60 bg-amber-100/25 text-amber-50'
+                            }`}
+                          >
                             {user.role}
+                          </span>
+                        </td>
+                        <td className="py-3 pr-3">
+                          <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-black uppercase tracking-[0.14em] ${user.isActive ? 'border-emerald-300/70 bg-emerald-300/20 text-emerald-100' : 'border-slate-400/70 bg-slate-400/20 text-slate-200'}`}>
+                            {user.isActive ? t('account.status.active') : t('account.status.inactive')}
                           </span>
                         </td>
                         <td className="py-3 pr-3">
                           <div className="flex gap-2">
                             <button
-                              className="rounded-lg border border-pine/30 px-3 py-1 font-semibold text-pine hover:bg-pine/5"
+                              className="rounded-lg border border-pine/30 px-3 py-1 font-semibold text-pine hover:bg-pine/5 disabled:cursor-not-allowed disabled:opacity-60"
+                              disabled={!user.isActive}
                               onClick={() => {
                                 void onChangeRole(user.id, 'User')
                               }}
@@ -277,13 +334,34 @@ export function AccountPage({ onAuthChanged }: AccountPageProps) {
                               {t('account.actions.makeUser')}
                             </button>
                             <button
-                              className="rounded-lg border border-amber-300 px-3 py-1 font-semibold text-amber-700 hover:bg-amber-50"
+                              className="rounded-lg border border-amber-300 px-3 py-1 font-semibold text-amber-700 hover:bg-amber-50 disabled:cursor-not-allowed disabled:opacity-60"
+                              disabled={!user.isActive}
                               onClick={() => {
                                 void onChangeRole(user.id, 'Admin')
                               }}
                               type="button"
                             >
                               {t('account.actions.makeAdmin')}
+                            </button>
+                            <button
+                              className="rounded-lg border border-red-300 px-3 py-1 font-semibold text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+                              disabled={currentUser?.id === user.id || !user.isActive}
+                              onClick={() => {
+                                setDeleteTarget(user)
+                              }}
+                              type="button"
+                            >
+                              {currentUser?.id === user.id ? t('account.actions.currentUser') : t('account.actions.deleteUser')}
+                            </button>
+                            <button
+                              className="rounded-lg border border-emerald-300 px-3 py-1 font-semibold text-emerald-700 hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-60"
+                              disabled={user.isActive}
+                              onClick={() => {
+                                void onReactivateUser(user.id)
+                              }}
+                              type="button"
+                            >
+                              {t('account.actions.reactivateUser')}
                             </button>
                           </div>
                         </td>
@@ -359,6 +437,36 @@ export function AccountPage({ onAuthChanged }: AccountPageProps) {
           </form>
         </div>
       )}
+
+      <ConfirmDialog
+        cancelLabel={t('common.cancel')}
+        confirmLabel={t('account.actions.deleteUser')}
+        description={deleteTarget ? t('account.messages.deleteConfirm') : ''}
+        isLoading={isDeletingUser}
+        isOpen={deleteTarget !== null}
+        onCancel={() => {
+          if (!isDeletingUser) {
+            setDeleteTarget(null)
+          }
+        }}
+        onConfirm={() => {
+          void confirmDeleteUser()
+        }}
+        title={t('account.actions.deleteUser')}
+      />
     </section>
   )
+}
+
+function getApiErrorMessage(error: unknown, fallback: string) {
+  if (!axios.isAxiosError(error)) {
+    return fallback
+  }
+
+  const serverMessage = error.response?.data?.message
+  if (typeof serverMessage === 'string' && serverMessage.trim().length > 0) {
+    return serverMessage
+  }
+
+  return fallback
 }

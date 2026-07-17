@@ -43,7 +43,7 @@ public sealed class ApiIntegrationTests
         await client.PostAsync("/api/account/logout", content: null);
         await client.PostAsJsonAsync("/api/account/register", new RegisterUserRequest("Regular User", "user@test.local", "P@ssw0rd123!"));
 
-        var createResponse = await client.PostAsJsonAsync("/api/recipes", new UpsertRecipeRequest("Unauthorized Recipe", "Should fail", 15, 2));
+        var createResponse = await client.PostAsJsonAsync("/api/recipes", new UpsertRecipeRequest("Unauthorized Recipe", "Should fail", null, 15, 2));
 
         Assert.Equal(HttpStatusCode.Forbidden, createResponse.StatusCode);
     }
@@ -56,7 +56,7 @@ public sealed class ApiIntegrationTests
 
         await client.PostAsJsonAsync("/api/account/register", new RegisterUserRequest("Admin User", "admin@test.local", "P@ssw0rd123!"));
 
-        var createResponse = await client.PostAsJsonAsync("/api/recipes", new UpsertRecipeRequest("Integration Recipe", "Created via API test", 20, 4));
+        var createResponse = await client.PostAsJsonAsync("/api/recipes", new UpsertRecipeRequest("Integration Recipe", "Created via API test", null, 20, 4));
         createResponse.EnsureSuccessStatusCode();
 
         var created = await createResponse.Content.ReadFromJsonAsync<RecipeDto>();
@@ -215,12 +215,97 @@ public sealed class ApiIntegrationTests
         await client.PostAsync("/api/account/logout", content: null);
         await client.PostAsJsonAsync("/api/account/login", new LoginRequest("user@test.local", "P@ssw0rd123!"));
 
-        var createRecipeResponse = await client.PostAsJsonAsync("/api/recipes", new UpsertRecipeRequest("Promoted Admin Recipe", "Created after role promotion", 25, 4));
+        var createRecipeResponse = await client.PostAsJsonAsync("/api/recipes", new UpsertRecipeRequest("Promoted Admin Recipe", "Created after role promotion", null, 25, 4));
         createRecipeResponse.EnsureSuccessStatusCode();
 
         var meAfterPromotion = await client.GetFromJsonAsync<AuthUserDto>("/api/account/me");
         Assert.NotNull(meAfterPromotion);
         Assert.Equal(UserRoles.Admin, meAfterPromotion.Role);
+    }
+
+    [Fact]
+    public async Task Admin_CanDeleteUser_AndDeletedUserCannotLogin()
+    {
+        await using var factory = new CustomWebApplicationFactory();
+        using var client = factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+
+        await client.PostAsJsonAsync("/api/account/register", new RegisterUserRequest("Admin User", "admin@test.local", "P@ssw0rd123!"));
+        await client.PostAsync("/api/account/logout", content: null);
+        await client.PostAsJsonAsync("/api/account/register", new RegisterUserRequest("Regular User", "user@test.local", "P@ssw0rd123!"));
+        await client.PostAsync("/api/account/logout", content: null);
+        await client.PostAsJsonAsync("/api/account/login", new LoginRequest("admin@test.local", "P@ssw0rd123!"));
+
+        var users = await client.GetFromJsonAsync<List<AuthUserDto>>("/api/account/users");
+        var regularUser = Assert.Single(users!.Where(user => user.Email == "user@test.local"));
+
+        var deleteResponse = await client.DeleteAsync($"/api/account/users/{regularUser.Id}");
+        Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
+
+        await client.PostAsync("/api/account/logout", content: null);
+        var loginResponse = await client.PostAsJsonAsync("/api/account/login", new LoginRequest("user@test.local", "P@ssw0rd123!"));
+
+        Assert.Equal(HttpStatusCode.Unauthorized, loginResponse.StatusCode);
+    }
+
+    [Fact]
+    public async Task Admin_CanReactivateUser_AndUserCanLoginAgain()
+    {
+        await using var factory = new CustomWebApplicationFactory();
+        using var client = factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+
+        await client.PostAsJsonAsync("/api/account/register", new RegisterUserRequest("Admin User", "admin@test.local", "P@ssw0rd123!"));
+        await client.PostAsync("/api/account/logout", content: null);
+        await client.PostAsJsonAsync("/api/account/register", new RegisterUserRequest("Regular User", "user@test.local", "P@ssw0rd123!"));
+        await client.PostAsync("/api/account/logout", content: null);
+        await client.PostAsJsonAsync("/api/account/login", new LoginRequest("admin@test.local", "P@ssw0rd123!"));
+
+        var users = await client.GetFromJsonAsync<List<AuthUserDto>>("/api/account/users");
+        var regularUser = Assert.Single(users!.Where(user => user.Email == "user@test.local"));
+
+        var deleteResponse = await client.DeleteAsync($"/api/account/users/{regularUser.Id}");
+        Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
+
+        var reactivateResponse = await client.PostAsync($"/api/account/users/{regularUser.Id}/reactivate", content: null);
+        Assert.Equal(HttpStatusCode.NoContent, reactivateResponse.StatusCode);
+
+        await client.PostAsync("/api/account/logout", content: null);
+        var loginResponse = await client.PostAsJsonAsync("/api/account/login", new LoginRequest("user@test.local", "P@ssw0rd123!"));
+
+        Assert.Equal(HttpStatusCode.OK, loginResponse.StatusCode);
+    }
+
+    [Fact]
+    public async Task Admin_CannotDeleteLastActiveAdmin()
+    {
+        await using var factory = new CustomWebApplicationFactory();
+        using var client = factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+
+        var registerResponse = await client.PostAsJsonAsync("/api/account/register", new RegisterUserRequest("Only Admin", "admin@test.local", "P@ssw0rd123!"));
+        registerResponse.EnsureSuccessStatusCode();
+
+        var me = await client.GetFromJsonAsync<AuthUserDto>("/api/account/me");
+        Assert.NotNull(me);
+
+        var deleteResponse = await client.DeleteAsync($"/api/account/users/{me!.Id}");
+
+        Assert.Equal(HttpStatusCode.BadRequest, deleteResponse.StatusCode);
+    }
+
+    [Fact]
+    public async Task Admin_CannotDemoteLastActiveAdmin()
+    {
+        await using var factory = new CustomWebApplicationFactory();
+        using var client = factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+
+        var registerResponse = await client.PostAsJsonAsync("/api/account/register", new RegisterUserRequest("Only Admin", "admin@test.local", "P@ssw0rd123!"));
+        registerResponse.EnsureSuccessStatusCode();
+
+        var me = await client.GetFromJsonAsync<AuthUserDto>("/api/account/me");
+        Assert.NotNull(me);
+
+        var demoteResponse = await client.PutAsJsonAsync($"/api/account/users/{me!.Id}/role", new UpdateUserRoleRequest(UserRoles.User));
+
+        Assert.Equal(HttpStatusCode.BadRequest, demoteResponse.StatusCode);
     }
 
     private sealed class FakeNewsletterReportingService : INewsletterReportingService

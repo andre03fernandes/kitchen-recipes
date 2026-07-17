@@ -27,36 +27,177 @@ public sealed class NewsletterCampaignService : INewsletterCampaignService
                 Name: "Weekly Menu Boost",
                 Description: "Highlight a weekly set of practical recipes for subscribers.",
                 Subject: "Your Weekly Kitchen Recipes Are Ready",
-                HtmlBody: "<h2>Your Weekly Kitchen Recipes Are Ready</h2><p>Fresh recipes for this week are live in Kitchen Recipes. Explore simple meals, prep faster, and cook with confidence.</p><p><strong>Top picks:</strong> one quick lunch, one family dinner, and one healthy snack.</p><p>Open the app and start cooking today.</p>",
-                PlainTextBody: "Your Weekly Kitchen Recipes Are Ready. Fresh recipes for this week are live in Kitchen Recipes. Open the app and start cooking today."),
+                                HtmlBody: """
+                                                    <div style="margin:0;padding:28px 0;background:#0f1218;font-family:Arial,'Segoe UI',sans-serif;color:#e7eef8;">
+                                                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                                                            <tr>
+                                                                <td align="center">
+                                                                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="640" style="max-width:640px;background:#1b2431;border:1px solid #4b6487;border-radius:20px;overflow:hidden;">
+                                                                        <tr>
+                                                                            <td style="background:linear-gradient(135deg,#263243,#1b2431);padding:28px 34px;color:#e7eef8;">
+                                                                                <p style="margin:0;font-size:12px;letter-spacing:2px;text-transform:uppercase;opacity:0.9;color:#87b6ff;">Kitchen Recipes</p>
+                                                                                <h1 style="margin:10px 0 0;font-size:28px;line-height:1.2;">Your Weekly Menu Is Ready</h1>
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td style="padding:30px 34px;">
+                                                                                <p style="margin:0 0 16px;font-size:16px;line-height:1.6;">Plan less, cook more. This week brings a practical mix of quick meals and comforting classics.</p>
+                                                                                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:8px 0 18px;">
+                                                                                    <tr>
+                                                                                        <td style="padding:12px;border:1px solid #5b8fe0;border-radius:12px;background:#263243;font-size:14px;line-height:1.5;color:#c0cfe3;">
+                                                                                            <strong>Top picks:</strong> one 15-minute lunch, one family dinner, and one smart snack prep.
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                </table>
+                                                                                <a href="https://kitchenrecipes.local/recipes" style="display:inline-block;padding:12px 20px;background:#5b8fe0;color:#0f1218;text-decoration:none;border-radius:10px;font-weight:700;">Open Weekly Recipes</a>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </table>
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </div>
+                                                    """,
+                                PlainTextBody: "Weekly Menu Boost: this week includes a 15-minute lunch, a family dinner, and a snack prep plan. Open Kitchen Recipes to see your weekly picks."),
             new(
                 Key: "pantry_rescue",
                 Name: "Pantry Rescue",
                 Description: "Encourage users to cook with ingredients they already have.",
                 Subject: "Turn Pantry Items Into Great Meals",
-                HtmlBody: "<h2>Turn Pantry Items Into Great Meals</h2><p>You already have enough ingredients to create excellent recipes.</p><p>Check your pantry list and try a low-waste cooking session today.</p><p>Simple ingredients, smart choices, tasty results.</p>",
-                PlainTextBody: "Turn Pantry Items Into Great Meals. Check your pantry list and try a low-waste cooking session today."),
+                                HtmlBody: """
+                                                    <div style="margin:0;padding:26px 0;background:#0f1218;font-family:Arial,'Segoe UI',sans-serif;color:#e7eef8;">
+                                                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                                                            <tr>
+                                                                <td align="center">
+                                                                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="620" style="max-width:620px;background:#1b2431;border:1px solid #4b6487;border-radius:18px;overflow:hidden;">
+                                                                        <tr>
+                                                                            <td style="padding:24px 30px;background:#263243;border-bottom:1px solid #4b6487;">
+                                                                                <h2 style="margin:0;font-size:25px;line-height:1.3;color:#87b6ff;">Pantry Rescue Mode</h2>
+                                                                                <p style="margin:8px 0 0;font-size:14px;color:#c0cfe3;">Waste less, cook smarter, save money.</p>
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td style="padding:26px 30px;">
+                                                                                <p style="margin:0 0 14px;font-size:16px;line-height:1.6;">You already have enough ingredients for a complete meal. Start from your pantry and let the assistant suggest combinations.</p>
+                                                                                <ul style="margin:0 0 18px;padding-left:18px;font-size:14px;line-height:1.7;color:#c0cfe3;">
+                                                                                    <li>Build meals from what expires first</li>
+                                                                                    <li>Prioritize low-waste ingredient swaps</li>
+                                                                                    <li>Finish leftovers with practical pairings</li>
+                                                                                </ul>
+                                                                                <a href="https://kitchenrecipes.local/pantry" style="display:inline-block;padding:11px 18px;background:#87b6ff;color:#0f1218;text-decoration:none;border-radius:10px;font-weight:700;">Open Pantry Assistant</a>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </table>
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </div>
+                                                    """,
+                                PlainTextBody: "Pantry Rescue: cook with ingredients you already have, reduce waste, and use smart substitutions from your pantry assistant."),
             new(
                 Key: "seasonal_special",
                 Name: "Seasonal Special",
                 Description: "Promote seasonal ingredients and themed cooking ideas.",
                 Subject: "Seasonal Flavors Are Here",
-                HtmlBody: "<h2>Seasonal Flavors Are Here</h2><p>This season is perfect for colorful, affordable, and nutritious recipes.</p><p>Open Kitchen Recipes to discover curated seasonal meals and tips.</p>",
-                PlainTextBody: "Seasonal Flavors Are Here. Open Kitchen Recipes to discover curated seasonal meals and tips."),
+                                HtmlBody: """
+                                                    <div style="margin:0;padding:32px 0;background:#0f1218;font-family:Georgia,'Times New Roman',serif;color:#e7eef8;">
+                                                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                                                            <tr>
+                                                                <td align="center">
+                                                                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="640" style="max-width:640px;background:#1b2431;border:1px solid #4b6487;border-radius:0;">
+                                                                        <tr>
+                                                                            <td style="padding:30px 34px;text-align:center;border-bottom:3px solid #6f6bff;">
+                                                                                <p style="margin:0;font-size:12px;letter-spacing:3px;text-transform:uppercase;color:#87b6ff;">Seasonal Collection</p>
+                                                                                <h1 style="margin:12px 0 0;font-size:34px;line-height:1.2;color:#e7eef8;">Seasonal Flavors Are Here</h1>
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td style="padding:28px 34px;">
+                                                                                <p style="margin:0 0 14px;font-size:17px;line-height:1.7;">Fresh produce is at its peak. Discover curated recipes built around seasonal ingredients and balanced nutrition.</p>
+                                                                                <p style="margin:0 0 18px;font-size:15px;line-height:1.7;color:#c0cfe3;">This edition highlights colorful bowls, roasted trays, and warm comfort options for the week.</p>
+                                                                                <div style="padding:12px 14px;border-left:4px solid #6f6bff;background:#263243;font-size:14px;line-height:1.6;color:#e7eef8;">Chef tip: choose 3 seasonal ingredients and build every meal around them for simpler planning.</div>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </table>
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </div>
+                                                    """,
+                                PlainTextBody: "Seasonal Special: discover curated recipes with seasonal ingredients, warm comfort dishes, and practical chef tips for weekly planning."),
             new(
                 Key: "healthy_starters",
                 Name: "Healthy Starters",
                 Description: "Share beginner-friendly healthy meal ideas.",
                 Subject: "Healthy Cooking Starts Today",
-                HtmlBody: "<h2>Healthy Cooking Starts Today</h2><p>Try balanced recipes with simple steps and clear ingredient lists.</p><p>Perfect if you want healthier habits without complex cooking routines.</p>",
-                PlainTextBody: "Healthy Cooking Starts Today. Try balanced recipes with simple steps and clear ingredient lists."),
+                                HtmlBody: """
+                                                    <div style="margin:0;padding:28px 0;background:#0f1218;font-family:Arial,'Segoe UI',sans-serif;color:#e7eef8;">
+                                                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                                                            <tr>
+                                                                <td align="center">
+                                                                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="620" style="max-width:620px;background:#1b2431;border:1px solid #4b6487;border-radius:14px;overflow:hidden;">
+                                                                        <tr>
+                                                                            <td style="padding:24px 28px;background:#263243;color:#e7eef8;">
+                                                                                <h2 style="margin:0;font-size:26px;line-height:1.3;">Healthy Cooking Starts Today</h2>
+                                                                                <p style="margin:8px 0 0;font-size:14px;color:#c0cfe3;">Simple steps. Real ingredients. Better routines.</p>
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td style="padding:26px 28px;">
+                                                                                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom:14px;">
+                                                                                    <tr>
+                                                                                        <td style="width:50%;padding:10px;border:1px solid #4b6487;background:#263243;font-size:13px;color:#e7eef8;"><strong>Breakfast:</strong> protein + fruit</td>
+                                                                                        <td style="width:50%;padding:10px;border:1px solid #4b6487;background:#263243;font-size:13px;color:#e7eef8;"><strong>Lunch:</strong> whole grains + greens</td>
+                                                                                    </tr>
+                                                                                </table>
+                                                                                <p style="margin:0 0 16px;font-size:15px;line-height:1.7;">Get beginner-friendly recipes with clear ingredient lists and predictable prep times.</p>
+                                                                                <a href="https://kitchenrecipes.local/recipes" style="display:inline-block;padding:11px 18px;background:#5b8fe0;color:#0f1218;text-decoration:none;border-radius:8px;font-weight:700;">View Healthy Starters</a>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </table>
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </div>
+                                                    """,
+                                PlainTextBody: "Healthy Starters: beginner-friendly meal ideas with simple steps, clear ingredients, and better daily routines."),
             new(
                 Key: "community_challenge",
                 Name: "Community Challenge",
                 Description: "Invite subscribers to a shared weekly cooking challenge.",
                 Subject: "Join This Week's Cooking Challenge",
-                HtmlBody: "<h2>Join This Week's Cooking Challenge</h2><p>Cook one recipe, share your variation, and improve your kitchen skills.</p><p>Challenge theme: fast meals under 30 minutes.</p><p>Let's cook together.</p>",
-                PlainTextBody: "Join This Week's Cooking Challenge. Theme: fast meals under 30 minutes. Let's cook together."),
+                                HtmlBody: """
+                                                    <div style="margin:0;padding:24px 0;background:#0f1218;font-family:Arial,'Segoe UI',sans-serif;color:#e7eef8;">
+                                                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                                                            <tr>
+                                                                <td align="center">
+                                                                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="620" style="max-width:620px;background:#1b2431;border:1px solid #4b6487;border-radius:18px;overflow:hidden;">
+                                                                        <tr>
+                                                                            <td style="padding:24px 28px;background:linear-gradient(135deg,#6f6bff,#5b8fe0);color:#e7eef8;">
+                                                                                <p style="margin:0;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#e7eef8;">Community Week</p>
+                                                                                <h2 style="margin:10px 0 0;font-size:29px;line-height:1.2;">30-Minute Cooking Challenge</h2>
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td style="padding:24px 28px;">
+                                                                                <p style="margin:0 0 14px;font-size:16px;line-height:1.7;color:#c0cfe3;">Cook one fast recipe, add your personal twist, and compare results with the community.</p>
+                                                                                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 16px;">
+                                                                                    <tr>
+                                                                                        <td style="padding:12px;border:1px solid #6f6bff;background:#263243;border-radius:10px;font-size:14px;color:#e7eef8;">
+                                                                                            <strong>This week's theme:</strong> complete meals under 30 minutes.
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                </table>
+                                                                                <a href="https://kitchenrecipes.local/assistant" style="display:inline-block;padding:11px 18px;background:#6f6bff;color:#e7eef8;text-decoration:none;border-radius:10px;font-weight:700;">Start the Challenge</a>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </table>
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </div>
+                                                    """,
+                                PlainTextBody: "Community Challenge: create a complete meal in under 30 minutes, share your variation, and improve your skills together."),
         ];
 
         return Task.FromResult(templates);

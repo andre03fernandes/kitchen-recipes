@@ -241,6 +241,37 @@ body {
   animation: catalogCardEnter 0.45s ease forwards;
 }
 
+.pantry-expiry-badge {
+  border: 1px solid transparent;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-shadow: none;
+}
+
+.pantry-expiry-badge-no-expiry {
+  background: rgba(149, 174, 214, 0.28) !important;
+  border-color: rgba(172, 194, 229, 0.72) !important;
+  color: #f2f7ff !important;
+}
+
+.pantry-expiry-badge-expired {
+  background: rgba(255, 92, 120, 0.28) !important;
+  border-color: rgba(255, 130, 154, 0.86) !important;
+  color: #ffe9ee !important;
+}
+
+.pantry-expiry-badge-expiring {
+  background: rgba(255, 184, 92, 0.34) !important;
+  border-color: rgba(255, 205, 128, 0.86) !important;
+  color: #fff4de !important;
+}
+
+.pantry-expiry-badge-fresh {
+  background: rgba(88, 214, 164, 0.32) !important;
+  border-color: rgba(136, 236, 196, 0.84) !important;
+  color: #e9fff6 !important;
+}
+
 @keyframes homeReveal {
   to {
     opacity: 1;

@@ -37,3 +37,11 @@ export async function getUsers(): Promise<AuthUserDto[]> {
 export async function updateUserRole(userId: number, request: UpdateUserRoleRequest): Promise<void> {
   await apiClient.put(`/users/${userId}/role`, request)
 }
+
+export async function deleteUser(userId: number): Promise<void> {
+  await apiClient.delete(`/users/${userId}`)
+}
+
+export async function reactivateUser(userId: number): Promise<void> {
+  await apiClient.post(`/users/${userId}/reactivate`)
+}

@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using System.Text;
 using KitchenRecipes.Application.Abstractions;
 using KitchenRecipes.Application.DTOs;
@@ -11,6 +12,7 @@ namespace KitchenRecipes.Application.Services;
 public sealed class AssistantConversationService : IAssistantConversationService
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
+    private const string ImageMarkerPattern = @"\[\[image:(https?://[^\]\s]+)\]\]";
 
     private readonly IApplicationDbContext _context;
     private readonly IPantryAssistantService _pantryAssistantService;
@@ -88,20 +90,9 @@ public sealed class AssistantConversationService : IAssistantConversationService
             new PantryAssistantChatRequestDto(request.Message.Trim(), Limit: 4),
             cancellationToken);
 
-        var userPromptWithContext = await BuildUserPromptWithContextAsync(
-            thread.Id,
-            assistantDraft.UserMessage,
-            includeCurrentMessage: true,
-            cancellationToken);
-
-        var aiReply = await _assistantTextGenerator.GenerateReplyAsync(
-            assistantDraft.SystemPrompt,
-            userPromptWithContext,
-            cancellationToken);
-
-        var assistantContent = string.IsNullOrWhiteSpace(aiReply)
-            ? assistantDraft.FallbackMessage
-            : aiReply.Trim();
+        var assistantContent = IsImageGenerationRequest(assistantDraft.UserMessage)
+            ? BuildImageAssistantMessage(assistantDraft.UserMessage)
+            : await BuildTextAssistantReplyAsync(thread.Id, assistantDraft, includeCurrentMessage: true, cancellationToken);
 
         var assistantMessage = new AssistantChatMessage
         {
@@ -175,6 +166,41 @@ public sealed class AssistantConversationService : IAssistantConversationService
             Thread: threadSummary,
             UserMessage: MapMessage(userMessage),
             AssistantMessage: null);
+
+        if (IsImageGenerationRequest(assistantDraft.UserMessage))
+        {
+            var imageAssistantContent = BuildImageAssistantMessage(assistantDraft.UserMessage);
+            var imageAssistantMessage = new AssistantChatMessage
+            {
+                AssistantChatThreadId = thread.Id,
+                Role = "assistant",
+                Content = imageAssistantContent,
+                PantryHighlightsJson = JsonSerializer.Serialize(assistantDraft.PantryHighlights, JsonOptions),
+                SuggestedRecipesJson = JsonSerializer.Serialize(assistantDraft.SuggestedRecipes, JsonOptions),
+                FollowUpPromptsJson = JsonSerializer.Serialize(assistantDraft.FollowUpPrompts, JsonOptions),
+            };
+
+            _context.AssistantChatMessages.Add(imageAssistantMessage);
+            thread.LastMessagePreview = BuildPreview(imageAssistantContent);
+            thread.UpdatedAtUtc = DateTime.UtcNow;
+            await _context.SaveChangesAsync(cancellationToken);
+
+            var imageThread = new AssistantChatThreadSummaryDto(
+                thread.Id,
+                thread.Title,
+                thread.LastMessagePreview,
+                thread.CreatedAtUtc,
+                thread.UpdatedAtUtc ?? thread.CreatedAtUtc);
+
+            yield return new AssistantChatStreamEventDto(
+                Type: "done",
+                Token: null,
+                Thread: imageThread,
+                UserMessage: null,
+                AssistantMessage: MapMessage(imageAssistantMessage));
+
+            yield break;
+        }
 
         var streamedBuilder = new StringBuilder();
         await foreach (var token in _assistantTextGenerator.GenerateReplyStreamAsync(
@@ -350,6 +376,51 @@ public sealed class AssistantConversationService : IAssistantConversationService
         return builder.ToString().TrimEnd();
     }
 
+    private async Task<string> BuildTextAssistantReplyAsync(
+        int threadId,
+        PantryAssistantChatDraftDto assistantDraft,
+        bool includeCurrentMessage,
+        CancellationToken cancellationToken)
+    {
+        var userPromptWithContext = await BuildUserPromptWithContextAsync(
+            threadId,
+            assistantDraft.UserMessage,
+            includeCurrentMessage,
+            cancellationToken);
+
+        var aiReply = await _assistantTextGenerator.GenerateReplyAsync(
+            assistantDraft.SystemPrompt,
+            userPromptWithContext,
+            cancellationToken);
+
+        return string.IsNullOrWhiteSpace(aiReply)
+            ? assistantDraft.FallbackMessage
+            : aiReply.Trim();
+    }
+
+    private static bool IsImageGenerationRequest(string message)
+    {
+        if (string.IsNullOrWhiteSpace(message))
+        {
+            return false;
+        }
+
+        var normalized = message.Trim().ToLowerInvariant();
+        var asksForImage = Regex.IsMatch(normalized, @"\b(image|imagem|photo|foto|picture|pic|illustration|ilustracao|ilustração|render)\b", RegexOptions.IgnoreCase);
+        var asksForCreation = Regex.IsMatch(normalized, @"\b(generate|gera|gerar|create|cria|criar|make|fazer|draw|desenha|desenhar|show|mostra|mostrar|render|renderize|renderizar)\b", RegexOptions.IgnoreCase);
+        return asksForImage && asksForCreation;
+    }
+
+    private static string BuildImageAssistantMessage(string userPrompt)
+    {
+        var normalizedPrompt = Regex.Replace(userPrompt.Trim(), @"\s+", " ");
+        var encodedPrompt = Uri.EscapeDataString(normalizedPrompt);
+        var seed = Random.Shared.Next(1, int.MaxValue);
+        var imageUrl = $"https://image.pollinations.ai/prompt/{encodedPrompt}?width=1024&height=1024&seed={seed}&nologo=true";
+
+        return $"Here is a generated image for: \"{normalizedPrompt}\".\n[[image:{imageUrl}]]";
+    }
+
     private static AssistantChatMessageDto MapMessage(AssistantChatMessage message)
     {
         return new AssistantChatMessageDto(
@@ -391,7 +462,7 @@ public sealed class AssistantConversationService : IAssistantConversationService
 
     private static string BuildPreview(string message)
     {
-        var normalized = message.Trim();
+        var normalized = Regex.Replace(message ?? string.Empty, ImageMarkerPattern, string.Empty, RegexOptions.IgnoreCase).Trim();
         if (normalized.Length <= 120)
         {
             return normalized;
