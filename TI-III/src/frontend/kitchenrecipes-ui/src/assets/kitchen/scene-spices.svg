@@ -1,0 +1,24 @@
+<svg width="1280" height="800" viewBox="0 0 1280 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1280" y2="800" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1E1B4B"/>
+      <stop offset="1" stop-color="#7C3AED"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="800" rx="48" fill="url(#bg)"/>
+
+  <rect x="110" y="170" width="1060" height="470" rx="42" fill="#0F172A" fill-opacity="0.28"/>
+
+  <rect x="190" y="250" width="180" height="290" rx="20" fill="#F97316"/>
+  <rect x="400" y="250" width="180" height="290" rx="20" fill="#FACC15"/>
+  <rect x="610" y="250" width="180" height="290" rx="20" fill="#EF4444"/>
+  <rect x="820" y="250" width="180" height="290" rx="20" fill="#22C55E"/>
+
+  <rect x="190" y="220" width="180" height="36" rx="12" fill="#F3F4F6" fill-opacity="0.9"/>
+  <rect x="400" y="220" width="180" height="36" rx="12" fill="#F3F4F6" fill-opacity="0.9"/>
+  <rect x="610" y="220" width="180" height="36" rx="12" fill="#F3F4F6" fill-opacity="0.9"/>
+  <rect x="820" y="220" width="180" height="36" rx="12" fill="#F3F4F6" fill-opacity="0.9"/>
+
+  <text x="82" y="88" font-family="Georgia, serif" font-size="52" font-weight="700" fill="#F5F3FF">Spice Lab Collection</text>
+  <text x="82" y="742" font-family="Arial, sans-serif" font-size="34" fill="#EDE9FE">Flavor blocks designed for creative seasoning choices.</text>
+</svg>

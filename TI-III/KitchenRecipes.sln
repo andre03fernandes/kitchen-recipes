@@ -1,0 +1,61 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{97005C1E-CB19-40AC-A8F9-8841FB67A70E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "backend", "backend", "{7A566F7F-C288-475A-92CD-49313830C672}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KitchenRecipes.Web", "src\backend\KitchenRecipes.Web\KitchenRecipes.Web.csproj", "{B43CC00C-BD13-4A1E-9D1C-3905CBA67766}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KitchenRecipes.Domain", "src\backend\KitchenRecipes.Domain\KitchenRecipes.Domain.csproj", "{5B82408C-A0E8-425C-99F0-E3FCC5D50FD9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KitchenRecipes.Application", "src\backend\KitchenRecipes.Application\KitchenRecipes.Application.csproj", "{B907188C-59DB-49DE-93FF-E97A4FD2F6DC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KitchenRecipes.Infrastructure", "src\backend\KitchenRecipes.Infrastructure\KitchenRecipes.Infrastructure.csproj", "{7AFFCE4B-BDFD-4E75-AF9E-FC3BB0DEDCC2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{5566FDAF-B24A-4050-A3E6-B97EB3E85B60}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KitchenRecipes.Tests", "src\tests\KitchenRecipes.Tests\KitchenRecipes.Tests.csproj", "{2594F6A0-BCCD-4514-A59C-3D60B951B34B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B43CC00C-BD13-4A1E-9D1C-3905CBA67766}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B43CC00C-BD13-4A1E-9D1C-3905CBA67766}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B43CC00C-BD13-4A1E-9D1C-3905CBA67766}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B43CC00C-BD13-4A1E-9D1C-3905CBA67766}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B82408C-A0E8-425C-99F0-E3FCC5D50FD9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B82408C-A0E8-425C-99F0-E3FCC5D50FD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B82408C-A0E8-425C-99F0-E3FCC5D50FD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B82408C-A0E8-425C-99F0-E3FCC5D50FD9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B907188C-59DB-49DE-93FF-E97A4FD2F6DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B907188C-59DB-49DE-93FF-E97A4FD2F6DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B907188C-59DB-49DE-93FF-E97A4FD2F6DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B907188C-59DB-49DE-93FF-E97A4FD2F6DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7AFFCE4B-BDFD-4E75-AF9E-FC3BB0DEDCC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7AFFCE4B-BDFD-4E75-AF9E-FC3BB0DEDCC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7AFFCE4B-BDFD-4E75-AF9E-FC3BB0DEDCC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7AFFCE4B-BDFD-4E75-AF9E-FC3BB0DEDCC2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2594F6A0-BCCD-4514-A59C-3D60B951B34B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2594F6A0-BCCD-4514-A59C-3D60B951B34B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2594F6A0-BCCD-4514-A59C-3D60B951B34B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2594F6A0-BCCD-4514-A59C-3D60B951B34B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7A566F7F-C288-475A-92CD-49313830C672} = {97005C1E-CB19-40AC-A8F9-8841FB67A70E}
+		{B43CC00C-BD13-4A1E-9D1C-3905CBA67766} = {7A566F7F-C288-475A-92CD-49313830C672}
+		{5B82408C-A0E8-425C-99F0-E3FCC5D50FD9} = {7A566F7F-C288-475A-92CD-49313830C672}
+		{B907188C-59DB-49DE-93FF-E97A4FD2F6DC} = {7A566F7F-C288-475A-92CD-49313830C672}
+		{7AFFCE4B-BDFD-4E75-AF9E-FC3BB0DEDCC2} = {7A566F7F-C288-475A-92CD-49313830C672}
+		{5566FDAF-B24A-4050-A3E6-B97EB3E85B60} = {97005C1E-CB19-40AC-A8F9-8841FB67A70E}
+		{2594F6A0-BCCD-4514-A59C-3D60B951B34B} = {5566FDAF-B24A-4050-A3E6-B97EB3E85B60}
+	EndGlobalSection
+EndGlobal

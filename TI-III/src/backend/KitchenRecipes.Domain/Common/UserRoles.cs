@@ -1,0 +1,14 @@
+namespace KitchenRecipes.Domain.Common;
+
+public static class UserRoles
+{
+    public const string Admin = "Admin";
+    public const string User = "User";
+
+    public static readonly string[] All = [Admin, User];
+
+    public static bool IsValid(string role)
+    {
+        return All.Contains(role);
+    }
+}

@@ -1,0 +1,24 @@
+<svg width="1280" height="800" viewBox="0 0 1280 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1280" y2="800" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0C4A6E"/>
+      <stop offset="1" stop-color="#0369A1"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="800" rx="48" fill="url(#bg)"/>
+
+  <circle cx="980" cy="210" r="120" fill="#FDE68A" fill-opacity="0.9"/>
+  <circle cx="980" cy="210" r="164" fill="#FDE68A" fill-opacity="0.22"/>
+
+  <rect x="110" y="250" width="1060" height="390" rx="36" fill="#F8FAFC" fill-opacity="0.2"/>
+  <ellipse cx="390" cy="430" rx="180" ry="130" fill="#FEF3C7"/>
+  <ellipse cx="390" cy="430" rx="120" ry="86" fill="#FCD34D"/>
+
+  <rect x="620" y="320" width="460" height="220" rx="26" fill="#FFF7ED"/>
+  <circle cx="720" cy="430" r="42" fill="#FB923C"/>
+  <circle cx="840" cy="430" r="42" fill="#F87171"/>
+  <circle cx="960" cy="430" r="42" fill="#34D399"/>
+
+  <text x="82" y="88" font-family="Georgia, serif" font-size="52" font-weight="700" fill="#E0F2FE">Morning Kitchen Ritual</text>
+  <text x="82" y="742" font-family="Arial, sans-serif" font-size="34" fill="#E0F2FE">Bright breakfast setup for energetic daily starts.</text>
+</svg>

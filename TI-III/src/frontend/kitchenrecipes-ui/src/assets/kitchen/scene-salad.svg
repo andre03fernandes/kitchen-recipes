@@ -1,0 +1,27 @@
+<svg width="1280" height="800" viewBox="0 0 1280 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1280" y2="800" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#14532D"/>
+      <stop offset="1" stop-color="#166534"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="800" rx="48" fill="url(#bg)"/>
+
+  <circle cx="640" cy="400" r="280" fill="#052E16"/>
+  <circle cx="640" cy="400" r="220" fill="#14532D"/>
+
+  <ellipse cx="540" cy="350" rx="72" ry="52" fill="#F97316"/>
+  <ellipse cx="720" cy="360" rx="78" ry="56" fill="#F43F5E"/>
+  <ellipse cx="660" cy="520" rx="92" ry="62" fill="#84CC16"/>
+  <ellipse cx="500" cy="470" rx="60" ry="42" fill="#A3E635"/>
+  <ellipse cx="780" cy="500" rx="60" ry="42" fill="#22C55E"/>
+
+  <circle cx="640" cy="402" r="42" fill="#FEF3C7"/>
+  <circle cx="572" cy="286" r="16" fill="#FACC15"/>
+  <circle cx="728" cy="290" r="16" fill="#FACC15"/>
+  <circle cx="812" cy="398" r="16" fill="#FACC15"/>
+  <circle cx="470" cy="404" r="16" fill="#FACC15"/>
+
+  <text x="82" y="88" font-family="Georgia, serif" font-size="52" font-weight="700" fill="#F0FDF4">Garden Bowl Showcase</text>
+  <text x="82" y="742" font-family="Arial, sans-serif" font-size="34" fill="#DCFCE7">Vibrant healthy composition for lunch menu storytelling.</text>
+</svg>

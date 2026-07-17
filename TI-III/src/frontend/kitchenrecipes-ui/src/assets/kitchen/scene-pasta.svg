@@ -1,0 +1,30 @@
+<svg width="1280" height="800" viewBox="0 0 1280 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1280" y2="800" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#111827"/>
+      <stop offset="1" stop-color="#0F766E"/>
+    </linearGradient>
+    <radialGradient id="light" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(340 220) rotate(45) scale(420 320)">
+      <stop stop-color="#A7F3D0" stop-opacity="0.6"/>
+      <stop offset="1" stop-color="#A7F3D0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1280" height="800" rx="48" fill="url(#bg)"/>
+  <rect width="1280" height="800" rx="48" fill="url(#light)"/>
+
+  <circle cx="640" cy="400" r="250" fill="#1F2937" stroke="#E5E7EB" stroke-opacity="0.3" stroke-width="8"/>
+  <path d="M480 410C520 350 760 350 800 410" stroke="#FDE68A" stroke-width="20" stroke-linecap="round"/>
+  <path d="M500 455C550 390 730 390 780 455" stroke="#FCD34D" stroke-width="18" stroke-linecap="round"/>
+  <path d="M520 500C570 435 710 435 760 500" stroke="#FBBF24" stroke-width="16" stroke-linecap="round"/>
+
+  <circle cx="556" cy="345" r="14" fill="#EF4444"/>
+  <circle cx="694" cy="358" r="14" fill="#EF4444"/>
+  <circle cx="626" cy="470" r="12" fill="#EF4444"/>
+  <circle cx="734" cy="438" r="12" fill="#EF4444"/>
+
+  <path d="M900 200L1120 420" stroke="#E5E7EB" stroke-width="12" stroke-linecap="round"/>
+  <path d="M870 250L1090 470" stroke="#E5E7EB" stroke-width="12" stroke-linecap="round"/>
+
+  <text x="84" y="86" font-family="Georgia, serif" font-size="52" font-weight="700" fill="#ECFDF5">Pasta Night Studio</text>
+  <text x="84" y="744" font-family="Arial, sans-serif" font-size="34" fill="#D1FAE5">High contrast plating concept for premium dinner mood.</text>
+</svg>

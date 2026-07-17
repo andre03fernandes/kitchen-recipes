@@ -1,0 +1,28 @@
+<svg width="1280" height="800" viewBox="0 0 1280 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1280" y2="800" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3F1D2E"/>
+      <stop offset="1" stop-color="#7C2D12"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="800" rx="48" fill="url(#bg)"/>
+
+  <rect x="210" y="210" width="860" height="380" rx="44" fill="#FEF3C7" fill-opacity="0.13"/>
+  <rect x="260" y="250" width="760" height="300" rx="36" fill="#FB7185" fill-opacity="0.2"/>
+
+  <circle cx="430" cy="400" r="110" fill="#7C2D12"/>
+  <circle cx="430" cy="400" r="72" fill="#FDE68A"/>
+
+  <circle cx="640" cy="400" r="110" fill="#7C2D12"/>
+  <circle cx="640" cy="400" r="72" fill="#FDE68A"/>
+
+  <circle cx="850" cy="400" r="110" fill="#7C2D12"/>
+  <circle cx="850" cy="400" r="72" fill="#FDE68A"/>
+
+  <circle cx="430" cy="328" r="14" fill="#F43F5E"/>
+  <circle cx="640" cy="328" r="14" fill="#F43F5E"/>
+  <circle cx="850" cy="328" r="14" fill="#F43F5E"/>
+
+  <text x="82" y="88" font-family="Georgia, serif" font-size="52" font-weight="700" fill="#FFE4E6">Dessert Atelier</text>
+  <text x="82" y="742" font-family="Arial, sans-serif" font-size="34" fill="#FFE4E6">Refined sweet-course visual identity for special menus.</text>
+</svg>

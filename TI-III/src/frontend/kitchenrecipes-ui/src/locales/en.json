@@ -1,0 +1,434 @@
+{
+  "shell": {
+    "title": "Kitchen Recipes",
+    "tagline": "An honest kitchen table with a modern Italian soul.",
+    "badge": "Base Project",
+    "headline": "A quieter, warmer way to plan the table.",
+    "subheadline": "Inspired by Italian kitchens, market mornings, and the rhythm of simple, shared meals."
+  },
+  "common": {
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "save": "Save",
+    "rename": "Rename",
+    "confirm": "Confirm"
+  },
+  "navigation": {
+    "home": "Home",
+    "assistant": "AI Assistant",
+    "recipes": "Recipes",
+    "pantry": "Pantry",
+    "newsletter": "Newsletter",
+    "account": "Account"
+  },
+  "tables": {
+    "filterLabel": "Filter",
+    "rowsPerPage": "Rows per page",
+    "viewCatalog": "Catalog",
+    "viewTable": "Table",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page",
+    "of": "of",
+    "exporting": "Exporting...",
+    "exportSuccess": "Table exported successfully.",
+    "exportError": "Unable to export table right now."
+  },
+  "home": {
+    "kicker": "Italian kitchen, center stage",
+    "heroTitle": "A table-led home with room to breathe.",
+    "heroDescription": "Built like a Sunday kitchen: market notes, pantry shelves, recipes, and the small rituals that make a meal feel lived in.",
+    "ctaPrimary": "Browse Recipes",
+    "ctaSecondary": "Open Pantry",
+    "ctaAssistant": "Ask for Inspiration",
+    "ctaLogin": "Sign In To Continue",
+    "ctaRegister": "Create Account",
+    "lockedTitle": "A private table, once you step in",
+    "lockedDescription": "Sign in to move through recipes, pantry notes, newsletters, and guided kitchen help.",
+    "session": {
+      "title": "At the table",
+      "welcome": "Welcome back, {name}",
+      "description": "Pick up where you left off and move through the kitchen with a calm, familiar rhythm."
+    },
+    "modules": {
+      "recipes": "Browse the recipe book and keep every dish ready for the season.",
+      "pantry": "See what is in the cupboard before the next market run.",
+      "newsletter": "Keep the community close with tasteful seasonal notes.",
+      "assistant": "Get gentle guidance when you want a second opinion in the kitchen."
+    },
+    "feature1Label": "The first plate",
+    "feature1Value": "Clean rhythm",
+    "feature1Description": "A soft entry into the kitchen with calm navigation and a clear first choice.",
+    "feature2Label": "The cupboard",
+    "feature2Value": "Quiet abundance",
+    "feature2Description": "A pantry view that keeps ingredients present, readable, and easy to trust.",
+    "feature3Label": "The evening note",
+    "feature3Value": "Simple guidance",
+    "feature3Description": "A discreet helper for the small decisions that shape a good meal.",
+    "journeyTitle": "How the kitchen unfolds",
+    "journeyDescription": "Three gentle moments that mirror a real Italian cooking day.",
+    "step1Label": "Morning",
+    "step1Title": "Choose what feels seasonal",
+    "step1Description": "Start with what is fresh, what is simple, and what the table is asking for.",
+    "step2Label": "Afternoon",
+    "step2Title": "Check the cupboard quietly",
+    "step2Description": "See what is ready, what needs using, and what can wait for tomorrow.",
+    "step3Label": "Evening",
+    "step3Title": "Set the table with confidence",
+    "step3Description": "Bring recipes, pantry, and taste together in a calmer final decision.",
+    "nextMilestoneTitle": "A better way to come home",
+    "nextMilestoneDescription": "The page now feels like a longer walk through the kitchen: less dashboard, more atmosphere, more story.",
+    "kitchenTip": "Use what is in season first, and let the simplest ingredient lead the dish.",
+    "highlight1Label": "Antipasto",
+    "highlight1Title": "Fresh beginnings",
+    "highlight1Description": "A small, elegant opening that sets the tone before the main dish arrives.",
+    "highlight2Label": "Primo",
+    "highlight2Title": "The heart of the page",
+    "highlight2Description": "A generous first course built to guide the eye without rushing the appetite.",
+    "highlight3Label": "Dolce",
+    "highlight3Title": "A softer finish",
+    "highlight3Description": "The last note lands gently, with warmth rather than noise.",
+    "story1Title": "At the market",
+    "story1Description": "Start with what is fresh, bright, and in season.",
+    "story1Label": "At the market",
+    "story2Title": "At the stove",
+    "story2Description": "Keep the process calm, clear, and pleasantly paced.",
+    "story2Label": "In the kitchen",
+    "story3Title": "At the table",
+    "story3Description": "End with a sense of place, care, and something shared.",
+    "story3Label": "At the table"
+  },
+  "recipes": {
+    "title": "Recipes Module",
+    "description": "Recipe list, create, update, and delete flows will be implemented here using API endpoints backed by SQL Server.",
+    "list": {
+      "title": "Recipes",
+      "description": "Manage your recipe catalog with full CRUD operations."
+    },
+    "catalog": {
+      "badges": {
+        "fast": "Fast",
+        "standard": "Standard",
+        "slowCook": "Slow Cook"
+      }
+    },
+    "form": {
+      "createTitle": "Create Recipe",
+      "editTitle": "Edit Recipe",
+      "description": "Provide recipe details below and save your changes."
+    },
+    "details": {
+      "title": "Recipe Details",
+      "description": "View recipe information in read-only mode.",
+      "createdAtUtc": "Created At"
+    },
+    "fields": {
+      "name": "Name",
+      "description": "Description",
+      "image": "Image",
+      "preparationMinutes": "Preparation Minutes",
+      "servings": "Servings",
+      "actions": "Actions"
+    },
+    "actions": {
+      "create": "Create Recipe",
+      "details": "Details",
+      "edit": "Edit",
+      "delete": "Delete",
+      "removeImage": "Remove Image",
+      "save": "Save",
+      "saving": "Saving...",
+      "cancel": "Cancel",
+      "backToList": "Back to List"
+    },
+    "messages": {
+      "loading": "Loading recipes...",
+      "empty": "No recipes yet. Create your first recipe.",
+      "deleted": "Recipe deleted successfully.",
+      "confirmDelete": "Delete this recipe?",
+      "noImage": "No image",
+      "noDescription": "No description"
+    },
+    "errors": {
+      "loadFailed": "Unable to load recipes right now.",
+      "loadDetailsFailed": "Unable to load recipe details.",
+      "invalidImageFile": "Please select a valid image file up to 2MB.",
+      "saveFailed": "Unable to save recipe. Check your data and try again.",
+      "deleteFailed": "Unable to delete recipe right now."
+    }
+  },
+  "pantry": {
+    "title": "Pantry Module",
+    "description": "Pantry ingredients and stock management will be tracked here, preparing the future AI recommendation workflow.",
+    "list": {
+      "title": "Pantry Items",
+      "description": "Track ingredients available in your fridge and pantry."
+    },
+    "catalog": {
+      "badges": {
+        "noExpiry": "No Expiry",
+        "expired": "Expired",
+        "expiringSoon": "Expiring Soon",
+        "fresh": "Fresh"
+      },
+      "filters": {
+        "all": "All",
+        "expiringSoon": "Expiring Soon",
+        "expired": "Expired",
+        "fresh": "Fresh",
+        "noExpiry": "No Expiry"
+      }
+    },
+    "form": {
+      "createTitle": "Create Pantry Item",
+      "editTitle": "Edit Pantry Item",
+      "description": "Set quantity, unit, and optional expiration date."
+    },
+    "details": {
+      "title": "Pantry Item Details",
+      "description": "View pantry item information in read-only mode.",
+      "createdAtUtc": "Created At",
+      "updatedAtUtc": "Updated At",
+      "notUpdated": "Not updated yet"
+    },
+    "fields": {
+      "name": "Name",
+      "image": "Image",
+      "availableQuantity": "Available Quantity",
+      "unit": "Unit",
+      "expirationDate": "Expiration Date",
+      "actions": "Actions"
+    },
+    "actions": {
+      "create": "Create Pantry Item",
+      "assistant": "Open AI Assistant",
+      "details": "Details",
+      "edit": "Edit",
+      "delete": "Delete",
+      "removeImage": "Remove Image",
+      "save": "Save",
+      "saving": "Saving...",
+      "cancel": "Cancel",
+      "backToList": "Back to List"
+    },
+    "messages": {
+      "loading": "Loading pantry items...",
+      "empty": "No pantry items yet. Create your first pantry item.",
+      "deleted": "Pantry item deleted successfully.",
+      "confirmDelete": "Delete this pantry item?",
+      "noImage": "No image",
+      "noExpirationDate": "No expiration date"
+    },
+    "errors": {
+      "loadFailed": "Unable to load pantry items right now.",
+      "loadDetailsFailed": "Unable to load pantry item details.",
+      "invalidImageFile": "Please select a valid image file up to 2MB.",
+      "saveFailed": "Unable to save pantry item. Check your data and try again.",
+      "deleteFailed": "Unable to delete pantry item right now."
+    }
+  },
+  "pantryAssistant": {
+    "title": "Kitchen AI Assistant",
+    "description": "A full-page assistant for the entire site: recipes, pantry, newsletter, account guidance, and live AI chat.",
+    "launcher": "AI Assistant",
+    "actions": {
+      "backToPantry": "Back to Pantry",
+      "send": "Ask Assistant",
+      "sending": "Thinking...",
+      "newChat": "New Chat",
+      "renameChat": "Rename",
+      "deleteChat": "Delete",
+      "fastMode": "Fast",
+      "qualityMode": "Quality"
+    },
+    "metrics": {
+      "pantryItems": "Pantry Items",
+      "recipesEvaluated": "Recipes Evaluated"
+    },
+    "labels": {
+      "matchScore": "Match Score",
+      "quantityCoverage": "Stock Coverage",
+      "preparationMinutes": "Preparation Minutes",
+      "servings": "Servings",
+      "matchedItems": "Matched Pantry Items",
+      "missingIngredients": "Missing Ingredients",
+      "insufficientIngredients": "Low Stock Ingredients",
+      "conversionInsights": "Unit Conversions"
+    },
+    "chat": {
+      "subtitle": "Ask anything about the Kitchen Recipes platform, from cooking ideas to where to do each task in the app.",
+      "welcome": "I am your full-site assistant. Ask for recipe ideas, pantry planning, newsletter actions, or account/admin guidance.",
+      "historyTitle": "Saved Conversations",
+      "modelProfileTitle": "Model Profile",
+      "activeModelLabel": "Active Model",
+      "followUpPrompts": "Follow-up Prompts",
+      "renamePrompt": "Rename this conversation",
+      "deleteConfirm": "Delete this conversation permanently?",
+      "starterPrompts": "Quick Prompt Ideas",
+      "assistantLabel": "Assistant",
+      "userLabel": "You",
+      "fridgeHighlights": "Current Pantry Highlights",
+      "inputLabel": "Ask For A Recipe",
+      "inputPlaceholder": "Example: I need a quick dinner with chicken, spinach, and not too many missing ingredients.",
+      "helper": "Mention ingredients, prep time, meal style, or protein preference.",
+      "recommendationsTitle": "Recommended Recipes",
+      "recommendationsDescription": "These cards update after each assistant reply so you can compare the best pantry matches."
+    },
+    "messages": {
+      "loading": "Generating suggestions...",
+      "empty": "No recipe suggestions yet. Add pantry items and recipe ingredients to improve results.",
+      "loadingThread": "Loading conversation...",
+      "streaming": "Assistant is typing...",
+      "noThreads": "No saved conversations yet. Start your first chat.",
+      "none": "None"
+    },
+    "errors": {
+      "messageFailed": "Unable to send your message right now.",
+      "threadLoadFailed": "Unable to load your saved conversations.",
+      "threadOpenFailed": "Unable to open this conversation right now.",
+      "threadRenameFailed": "Unable to rename this conversation right now.",
+      "threadDeleteFailed": "Unable to delete this conversation right now.",
+      "profileLoadFailed": "Unable to load AI profile settings.",
+      "profileUpdateFailed": "Unable to update AI profile right now.",
+      "promptRequired": "Please tell the assistant what kind of recipe you want."
+    }
+  },
+  "newsletter": {
+    "title": "Newsletter Module",
+    "description": "Newsletter sign-up and campaign sending will use Google SMTP with App Password, configured from secure settings.",
+    "list": {
+      "title": "Newsletter Subscribers",
+      "description": "Manage newsletter subscribers and confirmation status."
+    },
+    "form": {
+      "createTitle": "Create Subscriber",
+      "editTitle": "Edit Subscriber",
+      "description": "Configure subscriber email and confirmation status."
+    },
+    "details": {
+      "title": "Subscriber Details",
+      "description": "View subscriber information in read-only mode.",
+      "createdAtUtc": "Created At",
+      "updatedAtUtc": "Updated At",
+      "notUpdated": "Not updated yet"
+    },
+    "fields": {
+      "email": "Email",
+      "isConfirmed": "Is Confirmed",
+      "actions": "Actions"
+    },
+    "actions": {
+      "create": "Create Subscriber",
+      "details": "Details",
+      "edit": "Edit",
+      "delete": "Delete",
+      "save": "Save",
+      "saving": "Saving...",
+      "sendCampaign": "Send Template Campaign",
+      "sendingCampaign": "Sending Campaign...",
+      "applyHistoryFilters": "Apply Filters",
+      "exportHistory": "Export History (CSV)",
+      "exportingHistory": "Exporting History...",
+      "cancel": "Cancel",
+      "backToList": "Back to List"
+    },
+    "campaign": {
+      "title": "Newsletter Campaigns",
+      "description": "Select one of the 5 ready-to-send templates and deliver it to confirmed subscribers.",
+      "templateLabel": "Template",
+      "selectPlaceholder": "Select a template"
+    },
+    "stats": {
+      "totalSubscribers": "Total Subscribers",
+      "confirmedSubscribers": "Confirmed Subscribers",
+      "totalCampaignsSent": "Campaigns Sent"
+    },
+    "history": {
+      "title": "Campaign History",
+      "description": "Recent newsletter campaigns sent by admins.",
+      "empty": "No campaigns sent yet.",
+      "allTemplates": "All Templates",
+      "templateKey": "Template Key",
+      "recipients": "Recipients",
+      "sentAtUtc": "Sent At",
+      "sentFromUtc": "Sent From",
+      "sentToUtc": "Sent To",
+      "limit": "Rows"
+    },
+    "messages": {
+      "loading": "Loading subscribers...",
+      "empty": "No subscribers yet. Create your first subscriber.",
+      "deleted": "Subscriber deleted successfully.",
+      "confirmDelete": "Delete this subscriber?",
+      "campaignSent": "Campaign sent to {count} confirmed subscribers.",
+      "historyExported": "Campaign history exported successfully.",
+      "confirmed": "Confirmed",
+      "pending": "Pending"
+    },
+    "errors": {
+      "loadFailed": "Unable to load subscribers right now.",
+      "loadTemplatesFailed": "Unable to load newsletter templates right now.",
+      "loadDetailsFailed": "Unable to load subscriber details.",
+      "templateRequired": "Please select a template before sending.",
+      "sendCampaignFailed": "Unable to send campaign. Check SMTP settings and admin permissions.",
+      "exportHistoryFailed": "Unable to export campaign history right now.",
+      "saveFailed": "Unable to save subscriber. Check your data and try again.",
+      "deleteFailed": "Unable to delete subscriber right now."
+    }
+  },
+  "account": {
+    "title": "Account Module",
+    "description": "Register, login, and manage role-based access.",
+    "currentUser": "Current User",
+    "roleLabel": "Role",
+    "registerTitle": "Create Account",
+    "registerDescription": "New users can register here. The first account becomes Admin.",
+    "loginTitle": "Sign In",
+    "loginDescription": "Use your email and password to access protected features.",
+    "adminPanelTitle": "Admin Role Management",
+    "adminPanelDescription": "Only Admin users can change other users' roles.",
+    "fields": {
+      "fullName": "Full Name",
+      "email": "Email",
+      "password": "Password",
+      "role": "Role",
+      "actions": "Actions"
+    },
+    "actions": {
+      "register": "Register",
+      "login": "Login",
+      "goToLogin": "Go To Login",
+      "logout": "Logout",
+      "makeUser": "Set User",
+      "makeAdmin": "Set Admin"
+    },
+    "messages": {
+      "loading": "Loading account state...",
+      "authRequired": "You must login to view this content.",
+      "adminRequiredTitle": "Admin Access Required",
+      "adminRequired": "This action is restricted to Admin users.",
+      "registerSuccess": "Account created and signed in.",
+      "loginSuccess": "Login successful.",
+      "logoutSuccess": "Logged out successfully.",
+      "roleUpdated": "User role updated successfully."
+    },
+    "errors": {
+      "registerFailed": "Unable to register right now.",
+      "loginFailed": "Unable to login. Check your credentials.",
+      "logoutFailed": "Unable to logout right now.",
+      "loadUsersFailed": "Unable to load users list.",
+      "roleUpdateFailed": "Unable to update user role."
+    }
+  },
+  "footer": {
+    "title": "Kitchen Recipes",
+    "subtitle": "Refined kitchen flow, every day.",
+    "description": "A polished cooking workspace for recipes, pantry planning, and assistant-guided decisions. Designed to feel calm, premium, and effortlessly practical.",
+    "quickLinks": "Quick Links",
+    "valueTitle": "What stays elevated",
+    "valueOne": "A clean kitchen workflow that stays elegant on every screen size.",
+    "valueTwo": "A branded experience with consistent actions, rich contrast, and fewer distractions.",
+    "tagline": "Tailored for modern kitchen rituals.",
+    "copy": "Kitchen Recipes © 2026. All rights reserved."
+  }
+}
