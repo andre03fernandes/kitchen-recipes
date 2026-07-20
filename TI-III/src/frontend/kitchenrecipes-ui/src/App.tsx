@@ -27,6 +27,18 @@ const navItems = [
   { to: '/account', label: t('navigation.account') },
 ]
 
+function getVisibleNavItems(currentUser: AuthUserDto | null) {
+  if (!currentUser) {
+    return navItems.filter((item) => item.to === '/' || item.to === '/account')
+  }
+
+  if (currentUser.role === 'User') {
+    return navItems.filter((item) => item.to !== '/newsletter')
+  }
+
+  return navItems
+}
+
 type HomePageProps = {
   currentUser: AuthUserDto | null
 }
@@ -454,7 +466,7 @@ function App() {
             </div>
           </div>
           <nav className="flex flex-wrap gap-2">
-            {(currentUser ? navItems : navItems.filter((item) => item.to === '/' || item.to === '/account')).map((item) => (
+            {getVisibleNavItems(currentUser).map((item) => (
               <NavLink
                 key={item.to}
                 className={({ isActive }) =>

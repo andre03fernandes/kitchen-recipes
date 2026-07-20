@@ -23,6 +23,7 @@ const imageMarkerRegex = /\[\[image:(https?:\/\/[^\]\s]+)\]\]/i
 type ParsedAssistantContent = {
   text: string
   imageUrl: string | null
+  externalImageUrl: string | null
 }
 
 function parseAssistantContent(content: string): ParsedAssistantContent {
@@ -30,10 +31,14 @@ function parseAssistantContent(content: string): ParsedAssistantContent {
   const markerUrl = match?.[1]?.trim() ?? ''
   const safeImageUrl = toSafeHttpUrl(markerUrl)
   const text = content.replace(imageMarkerRegex, '').trim()
+  const proxiedImageUrl = safeImageUrl
+    ? `/api/assistant/image-proxy?url=${encodeURIComponent(safeImageUrl)}`
+    : null
 
   return {
     text,
-    imageUrl: safeImageUrl,
+    imageUrl: proxiedImageUrl,
+    externalImageUrl: safeImageUrl,
   }
 }
 
@@ -58,6 +63,20 @@ function toSafeHttpUrl(value: string): string | null {
   return null
 }
 
+function buildAssistantPdfTitle(message: AssistantChatMessageDto): string {
+  const plainText = stripImageMarker(message.content)
+  if (!plainText) {
+    return 'Assistant reply'
+  }
+
+  const firstLine = plainText.split('\n')[0]?.trim() ?? ''
+  if (!firstLine) {
+    return 'Assistant reply'
+  }
+
+  return firstLine.length > 60 ? `${firstLine.slice(0, 60).trim()}...` : firstLine
+}
+
 export function PantryAssistantPage() {
   const [threads, setThreads] = useState<AssistantChatThreadSummaryDto[]>([])
   const [activeThreadId, setActiveThreadId] = useState<number | null>(null)
@@ -71,6 +90,7 @@ export function PantryAssistantPage() {
   const [streamingAssistantMessageId, setStreamingAssistantMessageId] = useState<number | null>(null)
   const [profileSettings, setProfileSettings] = useState<AiProfileSettingsDto | null>(null)
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false)
+  const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null)
   const [renameTarget, setRenameTarget] = useState<AssistantChatThreadSummaryDto | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<AssistantChatThreadSummaryDto | null>(null)
   const chatScrollRef = useRef<HTMLDivElement | null>(null)
@@ -610,7 +630,7 @@ export function PantryAssistantPage() {
                     (() => {
                       const parsed = entry.role === 'assistant'
                         ? parseAssistantContent(entry.content)
-                        : { text: entry.content, imageUrl: null }
+                        : { text: entry.content, imageUrl: null, externalImageUrl: null }
 
                       return (
                     <div
@@ -626,10 +646,35 @@ export function PantryAssistantPage() {
                         <div className="mt-3 overflow-hidden rounded-2xl border border-emerald-200 bg-white p-2 shadow-sm">
                           <img
                             alt="Generated dish"
-                            className="h-auto max-h-[420px] w-full rounded-xl object-cover"
+                            className="h-auto max-h-[420px] w-full cursor-zoom-in rounded-xl object-cover"
                             loading="lazy"
+                            onError={(event) => {
+                              const fallbackUrl = parsed.externalImageUrl
+                              if (!fallbackUrl) {
+                                return
+                              }
+
+                              if (event.currentTarget.src !== fallbackUrl) {
+                                event.currentTarget.src = fallbackUrl
+                              }
+                            }}
+                            onClick={() => {
+                              setPreviewImageUrl(parsed.externalImageUrl ?? parsed.imageUrl)
+                            }}
                             src={parsed.imageUrl}
                           />
+                        </div>
+                      )}
+
+                      {entry.role === 'assistant' && (
+                        <div className="mt-3">
+                          <button
+                            className="rounded-lg border border-pine/30 bg-white px-3 py-1 text-xs font-semibold text-pine transition hover:bg-pine/5"
+                            onClick={() => exportAssistantReplyPdf(entry, buildAssistantPdfTitle(entry))}
+                            type="button"
+                          >
+                            Download this reply as PDF
+                          </button>
                         </div>
                       )}
 
@@ -751,6 +796,38 @@ export function PantryAssistantPage() {
         }}
         title={t('pantryAssistant.actions.deleteChat')}
       />
+
+      {previewImageUrl && (
+        <div
+          className="fixed inset-0 z-[70] flex items-center justify-center bg-slate/75 px-4 py-6"
+          onClick={() => setPreviewImageUrl(null)}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(event) => {
+            if (event.key === 'Escape' || event.key === 'Enter' || event.key === ' ') {
+              setPreviewImageUrl(null)
+            }
+          }}
+        >
+          <div
+            className="relative w-full max-w-5xl overflow-hidden rounded-2xl bg-white p-2 shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              className="absolute right-3 top-3 rounded-full bg-white/90 px-3 py-1 text-xs font-bold text-slate shadow"
+              onClick={() => setPreviewImageUrl(null)}
+              type="button"
+            >
+              Close
+            </button>
+            <img
+              alt="Generated dish preview"
+              className="max-h-[82vh] w-full rounded-xl object-contain"
+              src={previewImageUrl}
+            />
+          </div>
+        </div>
+      )}
     </section>
   )
 }

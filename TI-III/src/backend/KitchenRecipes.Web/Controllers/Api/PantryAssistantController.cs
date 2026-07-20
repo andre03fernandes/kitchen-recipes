@@ -190,6 +190,56 @@ public sealed class PantryAssistantController : ControllerBase
         }
     }
 
+    [HttpGet("image-proxy")]
+    public async Task<IActionResult> ProxyGeneratedImage(
+        [FromQuery] string? url,
+        [FromServices] IHttpClientFactory httpClientFactory,
+        CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(url))
+        {
+            return BadRequest(new { message = "Image URL is required." });
+        }
+
+        var validUrl = Uri.TryCreate(url, UriKind.Absolute, out var imageUri);
+        if (!validUrl || imageUri is null || imageUri.Scheme != Uri.UriSchemeHttps)
+        {
+            return BadRequest(new { message = "Invalid image URL." });
+        }
+
+        var host = imageUri.Host.ToLowerInvariant();
+        var isAllowedHost = host == "image.pollinations.ai" || host == "pollinations.ai";
+        if (!isAllowedHost)
+        {
+            return BadRequest(new { message = "Image host is not allowed." });
+        }
+
+        try
+        {
+            var httpClient = httpClientFactory.CreateClient();
+            using var request = new HttpRequestMessage(HttpMethod.Get, imageUri);
+            request.Headers.UserAgent.ParseAdd("KitchenRecipes/1.0");
+
+            using var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+            if (!response.IsSuccessStatusCode)
+            {
+                return StatusCode((int)response.StatusCode);
+            }
+
+            var contentType = response.Content.Headers.ContentType?.ToString() ?? "image/jpeg";
+            var imageBytes = await response.Content.ReadAsByteArrayAsync(cancellationToken);
+            return File(imageBytes, contentType);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch
+        {
+            return StatusCode(StatusCodes.Status502BadGateway);
+        }
+    }
+
     private int? TryGetUserId()
     {
         var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
